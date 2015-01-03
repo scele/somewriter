@@ -12,13 +12,13 @@ var fs = require('fs'),
     EventEmitter = require('events').EventEmitter;
 
 
-function InputDevice(dev, bufferSize, parse) {
+function InputDevice(dev, bufferSize, mode, parse) {
   this.wrap('onOpen');
   this.wrap('onRead');
   this.dev = dev;
   this.buf = new Buffer(bufferSize);
   this.parse = parse;
-  fs.open(this.dev, 'r', this.onOpen);
+  fs.open(this.dev, mode, this.onOpen);
 }
 
 InputDevice.prototype = Object.create(EventEmitter.prototype, {
@@ -55,7 +55,7 @@ InputDevice.prototype.onRead = function(bytesRead) {
 InputDevice.prototype.close = function(callback) {
   fs.close(this.fd, (function(){console.log(this);}));
   this.fd = undefined;
-}
+};
 
 
 // Keyboard
@@ -94,11 +94,20 @@ function Keyboard(dev) {
     dev.pendingEvent = event;
     return undefined;
   }
-  InputDevice.call(this, dev, 16, parseKeyboard);
+  InputDevice.call(this, dev, 16, 'r+', parseKeyboard);
 }
+
 Keyboard.prototype = Object.create(InputDevice.prototype, {
   constructor: {value: Keyboard}
 });
+
+Keyboard.prototype.led = function (led, value) {
+  var buf = new Buffer(16);
+  buf.writeUInt16LE(0x11, 8); // EV_LED
+  buf.writeUInt16LE(led, 10);
+  buf.writeUInt32LE(value, 12);
+  fs.write(this.fd, buf, 0, buf.length, null);
+};
 
 function Mouse(dev) {
   // Parse PS/2 mouse protocol
@@ -122,7 +131,7 @@ function Mouse(dev) {
     }
     return event;
   }
-  InputDevice.call(this, dev, 16, parseMouse);
+  InputDevice.call(this, dev, 16, 'r', parseMouse);
 }
 Mouse.prototype = Object.create(InputDevice.prototype, {
   constructor: {value: Mouse}
@@ -142,10 +151,16 @@ mouse.on('moved', console.log);
 var keyboard = new Keyboard('/dev/input/event1');
 keyboard.on('key', console.log);
 
-
-// to read only a specific mouse by id (e.g. /dev/input/mouse0) use
-// var mouse0 = newInputDevice(0);
-
-// to close mouse
-// mouse.close();
-// mouse = undefined;
+// Blinking leds demo
+setTimeout(function () {
+  keyboard.led(0, 0);
+  keyboard.led(1, 0);
+  keyboard.led(2, 0);
+  var currentLed = 2;
+  function blink() {
+    keyboard.led(currentLed, 0);
+    currentLed = (currentLed + 1) % 6;
+    keyboard.led(currentLed, 1);
+  }
+  var blinking = setInterval(blink, 200);
+}, 500);
