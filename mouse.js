@@ -15,7 +15,7 @@ var fs = require('fs'),
  * Parse PS/2 mouse protocol
  * According to http://www.computer-engineering.org/ps2mouse/
  */
-function parse(mouse, buffer) {
+function parseMouse(dev, buffer) {
   var event = {
     leftBtn:    (buffer[0] & 1  ) > 0, // Bit 0
     rightBtn:   (buffer[0] & 2  ) > 0, // Bit 1
@@ -35,19 +35,54 @@ function parse(mouse, buffer) {
   return event;
 }
 
-function Mouse(mouseid) {
-  this.wrap('onOpen');
-  this.wrap('onRead');
-  this.dev = typeof(mouseid) === 'number' ? 'mouse' + mouseid : 'mice';
-  this.buf = new Buffer(3);
-  fs.open('/dev/input/' + this.dev, 'r', this.onOpen);
+function parseKeyboard(dev, buffer) {
+  // /usr/include/linux/input.h:
+  // struct input_event {
+  //     struct timeval time;
+  //     __u16 type;
+  //     __u16 code;
+  //     __s32 value;
+  // };
+  var raw = {
+    type: buffer.readUInt16LE(8),
+    code: buffer.readUInt16LE(10),
+    value: buffer.readInt32LE(12)
+  };
+  var event = dev.pendingEvent || {};
+  switch (raw.type) {
+    case 0x00: // EV_SYN
+      dev.pendingEvent = undefined;
+      return event;
+    case 0x01: // EV_KEY
+      event.type = 'key';
+      event.code = raw.code;
+      event.value = raw.value;
+      break;
+    case 0x04: // EV_MSC
+      if (raw.code == 0x04)
+        event.scancode = raw.value;
+      break;
+    default:
+      console.log(raw);
+  }
+  dev.pendingEvent = event;
+  return undefined;
 }
 
-Mouse.prototype = Object.create(EventEmitter.prototype, {
-  constructor: {value: Mouse}
+function InputDevice(dev, bufferSize, parse) {
+  this.wrap('onOpen');
+  this.wrap('onRead');
+  this.dev = dev;
+  this.buf = new Buffer(bufferSize);
+  this.parse = parse;
+  fs.open(this.dev, 'r', this.onOpen);
+}
+
+InputDevice.prototype = Object.create(EventEmitter.prototype, {
+  constructor: {value: InputDevice}
 });
 
-Mouse.prototype.wrap = function(name) {
+InputDevice.prototype.wrap = function(name) {
   var self = this;
   var fn = this[name];
   this[name] = function (err) {
@@ -56,23 +91,25 @@ Mouse.prototype.wrap = function(name) {
   };
 };
 
-Mouse.prototype.onOpen = function(fd) {
+InputDevice.prototype.onOpen = function(fd) {
   this.fd = fd;
   this.startRead();
 };
 
-Mouse.prototype.startRead = function() {
-  fs.read(this.fd, this.buf, 0, 3, null, this.onRead);
+InputDevice.prototype.startRead = function() {
+  fs.read(this.fd, this.buf, 0, this.buf.length, null, this.onRead);
 };
 
-Mouse.prototype.onRead = function(bytesRead) {
-  var event = parse(this, this.buf);
-  event.dev = this.dev;
-  this.emit(event.type, event);
+InputDevice.prototype.onRead = function(bytesRead) {
+  var event = this.parse(this, this.buf);
+  if (event) {
+    event.dev = this.dev;
+    this.emit(event.type, event);
+  }
   if (this.fd) this.startRead();
 };
 
-Mouse.prototype.close = function(callback) {
+InputDevice.prototype.close = function(callback) {
   fs.close(this.fd, (function(){console.log(this);}));
   this.fd = undefined;
 }
@@ -82,12 +119,16 @@ Mouse.prototype.close = function(callback) {
  ****************/
 
 // read all mouse events from /dev/input/mice
-var mouse = new Mouse();
+var mouse = new InputDevice('/dev/input/mice', 3, parseMouse);
 mouse.on('button', console.log);
 mouse.on('moved', console.log);
 
+var keyboard = new InputDevice('/dev/input/event1', 16, parseKeyboard);
+keyboard.on('key', console.log);
+
+
 // to read only a specific mouse by id (e.g. /dev/input/mouse0) use
-// var mouse0 = newMouse(0);
+// var mouse0 = newInputDevice(0);
 
 // to close mouse
 // mouse.close();
