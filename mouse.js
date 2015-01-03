@@ -9,6 +9,7 @@
  */
 
 var fs = require('fs'),
+    _ = require('lodash'),
     EventEmitter = require('events').EventEmitter;
 
 
@@ -61,6 +62,75 @@ InputDevice.prototype.close = function(callback) {
 // Keyboard
 
 function Keyboard(dev) {
+  var codeMap = {
+    16: 'q',
+    17: 'w',
+    18: 'e',
+    19: 'r',
+    20: 't',
+    21: 'y',
+    22: 'u',
+    23: 'i',
+    24: 'o',
+    25: 'p',
+    25: '-',
+    30: 'a',
+    31: 's',
+    32: 'd',
+    33: 'f',
+    34: 'g',
+    35: 'h',
+    36: 'j',
+    37: 'k',
+    38: 'l',
+    39: '.',
+    40: ',',
+    44: 'z',
+    45: 'x',
+    46: 'c',
+    47: 'v',
+    48: 'b',
+    49: 'n',
+    50: 'm',
+    51: 'å',
+    52: 'ä',
+    53: 'ö',
+  };
+  var codeMapShift = {
+    16: 'Q',
+    17: 'W',
+    18: 'E',
+    19: 'R',
+    20: 'T',
+    21: 'Y',
+    22: 'U',
+    23: 'I',
+    24: 'O',
+    25: 'P',
+    26: '=',
+    30: 'A',
+    31: 'S',
+    32: 'D',
+    33: 'F',
+    34: 'G',
+    35: 'H',
+    36: 'J',
+    37: 'K',
+    38: 'L',
+    39: ':',
+    40: '+',
+    44: 'Z',
+    45: 'X',
+    46: 'C',
+    47: 'V',
+    48: 'B',
+    49: 'N',
+    50: 'M',
+    51: 'Å',
+    52: 'Ä',
+    53: 'Ö',
+  };
+
   function parseKeyboard(dev, buffer) {
     // /usr/include/linux/input.h:
     // struct input_event {
@@ -83,10 +153,13 @@ function Keyboard(dev) {
         event.type = 'key';
         event.code = raw.code;
         event.value = raw.value;
+        event.char = codeMap[raw.code];
         break;
       case 0x04: // EV_MSC
         if (raw.code == 0x04)
           event.scancode = raw.value;
+        break;
+      case 0x11: // EV_LED
         break;
       default:
         console.log(raw);
@@ -137,6 +210,53 @@ Mouse.prototype = Object.create(InputDevice.prototype, {
   constructor: {value: Mouse}
 });
 
+function Typewriter(keyboard, mouse) {
+
+  var tt = this;
+  var delta = {x: 0, y: 0};
+  var xabs = {min: Number.MAX_VALUE, max: Number.MIN_VALUE, cur: 0};
+  var stopTimeout, calibrateInterval;
+  function keypress(event) {
+    if (event.value == 1) {
+      tt.chars[tt.y][tt.x] = event.char;
+      tt.x++; // XXX
+      var text = _(tt.chars).map(function (x) { return x.join(''); }).join('\n');
+      var event = { type: 'changed', text: text };
+      tt.emit(event.type, event);
+    }
+  }
+  function stop() {
+    console.log(delta);
+    delta = {x: 0, y: 0};
+    clearInterval(calibrateInterval);
+    calibrateInterval = undefined;
+  }
+  function platen(event) {
+    delta.x -= event.yDelta; // Remap: x = -y
+    delta.y += event.xDelta;
+    xabs.cur -= event.yDelta;
+    xabs.min = Math.min(xabs.min, xabs.cur);
+    xabs.max = Math.max(xabs.max, xabs.cur);
+    xabs.span = xabs.max - xabs.min;
+    xabs.percentage = Math.round((xabs.cur - xabs.min)/xabs.span * 10000) / 100;
+    if (!calibrateInterval)
+      calibrateInterval = setInterval(console.log, 50, xabs);
+    clearTimeout(stopTimeout);
+    stopTimeout = setTimeout(stop, 100);
+  }
+  this.keyboard = keyboard;
+  this.mouse = mouse;
+  this.x = 0;
+  this.y = 0;
+  this.chars = [[]];
+  this.keyboard.on('key', keypress);
+  this.mouse.on('moved', platen);
+}
+
+Typewriter.prototype = Object.create(EventEmitter.prototype, {
+  constructor: {value: Typewriter}
+});
+
 
 
 /****************
@@ -145,11 +265,14 @@ Mouse.prototype = Object.create(InputDevice.prototype, {
 
 // read all mouse events from /dev/input/mice
 var mouse = new Mouse('/dev/input/mice');
-mouse.on('button', console.log);
-mouse.on('moved', console.log);
+//mouse.on('button', console.log);
+//mouse.on('moved', console.log);
 
 var keyboard = new Keyboard('/dev/input/event1');
-keyboard.on('key', console.log);
+//keyboard.on('key', console.log);
+
+var typewriter = new Typewriter(keyboard, mouse);
+typewriter.on('changed', console.log);
 
 // Blinking leds demo
 setTimeout(function () {

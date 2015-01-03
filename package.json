@@ -1,0 +1,22 @@
+{
+  "name": "somewriter",
+  "version": "1.0.0",
+  "description": "somewriter ==========",
+  "main": "mouse.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scele/somewriter.git"
+  },
+  "author": "Lauri Peltonen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/scele/somewriter/issues"
+  },
+  "homepage": "https://github.com/scele/somewriter",
+  "dependencies": {
+    "lodash": "^2.4.1"
+  }
+}
