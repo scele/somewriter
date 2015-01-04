@@ -140,6 +140,7 @@ function Keyboard(dev) {
     //     __s32 value;
     // };
     var raw = {
+      time: { tv_sec: buffer.readInt32LE(0), tv_usec: buffer.readInt32LE(4) },
       type: buffer.readUInt16LE(8),
       code: buffer.readUInt16LE(10),
       value: buffer.readInt32LE(12)
@@ -147,6 +148,7 @@ function Keyboard(dev) {
     var event = dev.pendingEvent || {};
     switch (raw.type) {
       case 0x00: // EV_SYN
+        event.time = raw.time.tv_sec * 1000 + raw.time.tv_usec / 1000; // ms
         dev.pendingEvent = undefined;
         return event;
       case 0x01: // EV_KEY
@@ -183,27 +185,42 @@ Keyboard.prototype.led = function (led, value) {
 };
 
 function Mouse(dev) {
-  // Parse PS/2 mouse protocol
-  // According to http://www.computer-engineering.org/ps2mouse/
   function parseMouse(dev, buffer) {
-    var event = {
-      leftBtn:    (buffer[0] & 1  ) > 0, // Bit 0
-      rightBtn:   (buffer[0] & 2  ) > 0, // Bit 1
-      middleBtn:  (buffer[0] & 4  ) > 0, // Bit 2
-      xSign:      (buffer[0] & 16 ) > 0, // Bit 4
-      ySign:      (buffer[0] & 32 ) > 0, // Bit 5
-      xOverflow:  (buffer[0] & 64 ) > 0, // Bit 6
-      yOverflow:  (buffer[0] & 128) > 0, // Bit 7
-      xDelta:      buffer.readInt8(1),   // Byte 2 as signed int
-      yDelta:      buffer.readInt8(2)    // Byte 3 as signed int
+    // /usr/include/linux/input.h:
+    // struct input_event {
+    //     struct timeval time;
+    //     __u16 type;
+    //     __u16 code;
+    //     __s32 value;
+    // };
+    var raw = {
+      time: { tv_sec: buffer.readInt32LE(0), tv_usec: buffer.readInt32LE(4) },
+      type: buffer.readUInt16LE(8),
+      code: buffer.readUInt16LE(10),
+      value: buffer.readInt32LE(12)
     };
-    if (event.leftBtn || event.rightBtn || event.middleBtn) {
-      event.type = 'button';
-    } else {
-      event.type = 'moved';
+    var event = dev.pendingEvent || {xDelta: 0, yDelta: 0};
+    switch (raw.type) {
+      case 0x00: // EV_SYN
+        event.time = raw.time.tv_sec * 1000 + raw.time.tv_usec / 1000; // ms
+        dev.pendingEvent = undefined;
+        return event;
+      case 0x02: // EV_REL
+        event.type = 'moved';
+        if (raw.code == 0x00) // REL_X
+          event.xDelta = raw.value;
+        else if (raw.code == 0x01) // REL_Y
+          event.yDelta = raw.value;
+        else
+          console.log(raw);
+        break;
+      default:
+        console.log(raw);
     }
-    return event;
+    dev.pendingEvent = event;
+    return undefined;
   }
+
   InputDevice.call(this, dev, 16, 'r', parseMouse);
 }
 Mouse.prototype = Object.create(InputDevice.prototype, {
@@ -264,7 +281,7 @@ Typewriter.prototype = Object.create(EventEmitter.prototype, {
  ****************/
 
 // read all mouse events from /dev/input/mice
-var mouse = new Mouse('/dev/input/mice');
+var mouse = new Mouse('/dev/input/event0');
 //mouse.on('button', console.log);
 //mouse.on('moved', console.log);
 
