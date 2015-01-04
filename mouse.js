@@ -229,20 +229,84 @@ Mouse.prototype = Object.create(InputDevice.prototype, {
 
 function Typewriter(keyboard, mouse) {
 
+  var HALF_SPACE = 59;
+  var FULL_SPACE = 118;
+  var SMALL_ROLL = 90; // One line is 2 or 3 small rolls, depending on line spacing
+  var STABLE_AFTER_KEYUP_TIME = 150;
+  var histogram = {};
+  var histogramNeg = {};
   var tt = this;
   var delta = {x: 0, y: 0};
   var xabs = {min: Number.MAX_VALUE, max: Number.MIN_VALUE, cur: 0};
-  var stopTimeout, calibrateInterval;
+  var stopTimeout, calibrateInterval, stableYTimeout;
+  function stableX() {
+    tt.x += Math.round(delta.x / HALF_SPACE) * 0.5;
+    if (tt.x < 0) {
+      var d = -Math.ceil(tt.x);
+      console.log('Shifting everything to the right by ' + d);
+      var spaces = Array(d);
+      _(tt.chars).each(function (l) { if (l) { Array.prototype.unshift.apply(l, spaces); } });
+      tt.x += d;
+    }
+    delta.x = 0;
+    console.log('Moved cursor horizontally to ' + tt.x + ',' + tt.y);
+  }
+  function stableY() {
+    console.log('delta.y: ' + delta.y);
+    var d = Math.round(delta.y / SMALL_ROLL);
+    tt.y += d;
+    if (tt.y < 0) {
+      var d = -tt.y;
+      console.log('Shifting everything to the right by ' + d);
+      while (d--)
+        tt.chars.unshift([]);
+      tt.y = 0;
+    }
+    delta.y = 0;
+    if (d)
+      console.log('Moved cursor vertically ' + d + ' lines to ' + tt.x + ',' + tt.y);
+  }
+
   function keypress(event) {
+    if (event.value == 0) {
+      // Key up: platen should be stable
+      setTimeout(stableX, STABLE_AFTER_KEYUP_TIME);
+    }
     if (event.value == 1) {
+      stableY();
+      stableX(); // XXX Is this true? The half tick might race to keydown..
+      if (tt.x != Math.ceil(tt.x)) {
+        console.log('Adjusting half step from ' + tt.x + ' to ' + Math.ceil(tt.x));
+        tt.x = Math.ceil(tt.x);
+      }
+      if (!(tt.y in tt.chars))
+        tt.chars[tt.y] = [];
       tt.chars[tt.y][tt.x] = event.char;
-      tt.x++; // XXX
-      var text = _(tt.chars).map(function (x) { return x.join(''); }).join('\n');
+      //tt.x++; // XXX
+      //for (i = 0; i < tt.y; i++)
+      //  if (typeof tt.chars[i] === 'undefined')
+      //    tt.chars[i] = [];
+      //for (i = 0; i < tt.x; i++)
+      //  if (typeof tt.chars[tt.y][i] === 'undefined')
+      //    tt.chars[tt.y][i] = ' ';
+
+      var lines = _(tt.chars).map(function (x) { return _(x || []).map(function (c) { return c || ' '; }).join(''); }).value();
+      // For each empty line, remove two consecutive empty lines.
+      var i, j;
+      for (i = 0; i < lines.length; i++)
+        for (j = 0; j < 3; j++)
+          if (!lines[i])
+            lines.splice(i, 1);
+      var text = _(lines).join('\n');
       var event = { type: 'changed', text: text };
       tt.emit(event.type, event);
     }
   }
   function stop() {
+    if (delta.x >= 0)
+      histogram[delta.y] = (histogram[delta.y] || 0) + 1;
+    else
+      histogramNeg[-delta.y] = (histogramNeg[-delta.y] || 0) + 1;
     console.log(delta);
     delta = {x: 0, y: 0};
     clearInterval(calibrateInterval);
@@ -256,11 +320,15 @@ function Typewriter(keyboard, mouse) {
     xabs.max = Math.max(xabs.max, xabs.cur);
     xabs.span = xabs.max - xabs.min;
     xabs.percentage = Math.round((xabs.cur - xabs.min)/xabs.span * 10000) / 100;
-    if (!calibrateInterval)
-      calibrateInterval = setInterval(console.log, 50, xabs);
-    clearTimeout(stopTimeout);
-    stopTimeout = setTimeout(stop, 100);
+    //if (!calibrateInterval)
+    //  calibrateInterval = setInterval(console.log, 50, xabs);
+    //clearTimeout(stopTimeout);
+    //stopTimeout = setTimeout(stop, 100);
+    clearTimeout(stableYTimeout);
+    stableYTimeout = setTimeout(stableY, 50);
   }
+  //setInterval(console.log, 5000, histogram);
+  //setInterval(console.log, 5000, histogramNeg);
   this.keyboard = keyboard;
   this.mouse = mouse;
   this.x = 0;
@@ -289,7 +357,7 @@ var keyboard = new Keyboard('/dev/input/event1');
 //keyboard.on('key', console.log);
 
 var typewriter = new Typewriter(keyboard, mouse);
-typewriter.on('changed', console.log);
+typewriter.on('changed', function (event) { console.log(event.text); });
 
 // Blinking leds demo
 setTimeout(function () {
