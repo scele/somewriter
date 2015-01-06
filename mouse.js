@@ -268,11 +268,17 @@ function Typewriter(keyboard, mouse) {
   function keypress(event) {
     if (event.value == 0) {
       // Key up: platen should be stable
+      console.log("Key up, calling stableX");
       setTimeout(stableX, STABLE_AFTER_KEYUP_TIME);
+      //keyLifted = true;
     }
     if (event.value == 1) {
       stableY();
-      stableX(); // XXX Is this true? The half tick might race to keydown..
+      // Cannot call stableX here, because the half tick that begins
+      // a keystroke might race with the keydown signal (and it does).
+      // On the other hand, we need to update the x position in case we
+      // have been scrolling left and right without typing.
+      //stableX();
       if (tt.x != Math.ceil(tt.x)) {
         console.log('Adjusting half step from ' + tt.x + ' to ' + Math.ceil(tt.x));
         tt.x = Math.ceil(tt.x);
