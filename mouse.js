@@ -295,8 +295,8 @@ function Typewriter(keyboard, mouse) {
         for (j = 0; j < 3; j++)
           if (!lines[i])
             lines.splice(i, 1);
-      var text = _(lines).join('\n');
-      var event = { type: 'changed', text: text };
+      tt.text = _(lines).join('\n');
+      var event = { type: 'changed', text: tt.text };
       tt.emit(event.type, event);
     }
   }
@@ -315,6 +315,7 @@ function Typewriter(keyboard, mouse) {
   this.x = 0;
   this.y = 0;
   this.chars = [[]];
+  this.text = '';
   this.keyboard.on('key', keypress);
   this.mouse.on('moved', platen);
 }
