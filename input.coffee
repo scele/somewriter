@@ -10,7 +10,7 @@ fs = require('fs')
 EventEmitter = require('events').EventEmitter
 
 class InputDevice extends EventEmitter
-  constructor: (@dev, bufferSize, mode, @parse) ->
+  constructor: (@dev, bufferSize, mode) ->
     @wrap('onOpen')
     @wrap('onRead')
     @buf = new Buffer(bufferSize)
@@ -27,7 +27,7 @@ class InputDevice extends EventEmitter
     fs.read(@fd, @buf, 0, @buf.length, null, @onRead)
 
   onRead: (bytesRead) ->
-    event = @parse(this, @buf)
+    event = @parse(@buf)
     if (event)
       event.dev = @dev
       @emit(event.type, event)
@@ -38,6 +38,8 @@ class InputDevice extends EventEmitter
 
 class Keyboard extends InputDevice
   constructor: (dev) ->
+    super(dev, 16, 'r+')
+  parse: (buffer) ->
     codeMap =
       16: ['q', 'Q']
       17: ['w', 'W']
@@ -72,43 +74,41 @@ class Keyboard extends InputDevice
       52: ['ä', 'Ä']
       53: ['ö', 'Ö']
 
-    parseKeyboard = (dev, buffer) ->
-      # /usr/include/linux/input.h:
-      # struct input_event {
-      #     struct timeval time
-      #     __u16 type
-      #     __u16 code
-      #     __s32 value
-      # }
-      raw =
-        time:
-          tv_sec: buffer.readInt32LE(0)
-          tv_usec: buffer.readInt32LE(4)
-        type: buffer.readUInt16LE(8)
-        code: buffer.readUInt16LE(10)
-        value: buffer.readInt32LE(12)
-      event = dev.pendingEvent || {}
-      switch (raw.type)
-        when 0x00 # EV_SYN
-          event.time = raw.time.tv_sec * 1000 + raw.time.tv_usec / 1000 # ms
-          dev.pendingEvent = undefined
-          return event
-        when 0x01 # EV_KEY
-          event.type = 'key'
-          event.code = raw.code
-          event.value = raw.value
-          event.char = codeMap[raw.code][0]
-          event.shiftChar = codeMap[raw.code][1]
-        when 0x04 # EV_MSC
-          if (raw.code == 0x04)
-            event.scancode = raw.value
-        when 0x11 # EV_LED
-          # Ignored
-        else
-          console.log(raw)
-      dev.pendingEvent = event
-      return undefined
-    super(dev, 16, 'r+', parseKeyboard)
+    # /usr/include/linux/input.h:
+    # struct input_event {
+    #     struct timeval time
+    #     __u16 type
+    #     __u16 code
+    #     __s32 value
+    # }
+    raw =
+      time:
+        tv_sec: buffer.readInt32LE(0)
+        tv_usec: buffer.readInt32LE(4)
+      type: buffer.readUInt16LE(8)
+      code: buffer.readUInt16LE(10)
+      value: buffer.readInt32LE(12)
+    event = dev.pendingEvent || {}
+    switch (raw.type)
+      when 0x00 # EV_SYN
+        event.time = raw.time.tv_sec * 1000 + raw.time.tv_usec / 1000 # ms
+        @pendingEvent = undefined
+        return event
+      when 0x01 # EV_KEY
+        event.type = 'key'
+        event.code = raw.code
+        event.value = raw.value
+        event.char = codeMap[raw.code][0]
+        event.shiftChar = codeMap[raw.code][1]
+      when 0x04 # EV_MSC
+        if (raw.code == 0x04)
+          event.scancode = raw.value
+      when 0x11 # EV_LED
+        # Ignored
+      else
+        console.log(raw)
+    @pendingEvent = event
+    return undefined
 
   led: (led, value) ->
     buf = new Buffer(16)
@@ -119,40 +119,40 @@ class Keyboard extends InputDevice
 
 class Mouse extends InputDevice
   constructor: (dev) ->
-    parseMouse = (dev, buffer) ->
-      # /usr/include/linux/input.h:
-      # struct input_event {
-      #     struct timeval time
-      #     __u16 type
-      #     __u16 code
-      #     __s32 value
-      # }
-      raw =
-        time:
-          tv_sec: buffer.readInt32LE(0)
-          tv_usec: buffer.readInt32LE(4)
-        type: buffer.readUInt16LE(8)
-        code: buffer.readUInt16LE(10)
-        value: buffer.readInt32LE(12)
-      event = dev.pendingEvent || {xDelta: 0, yDelta: 0}
-      switch raw.type
-        when 0x00 # EV_SYN
-          event.time = raw.time.tv_sec * 1000 + raw.time.tv_usec / 1000 # ms
-          dev.pendingEvent = undefined
-          return event
-        when 0x02 # EV_REL
-          event.type = 'moved'
-          if (raw.code == 0x00) # REL_X
-            event.xDelta = raw.value
-          else if (raw.code == 0x01) # REL_Y
-            event.yDelta = raw.value
-          else
-            console.log(raw)
+    super(dev, 16, 'r')
+  parse: (buffer) ->
+    # /usr/include/linux/input.h:
+    # struct input_event {
+    #     struct timeval time
+    #     __u16 type
+    #     __u16 code
+    #     __s32 value
+    # }
+    raw =
+      time:
+        tv_sec: buffer.readInt32LE(0)
+        tv_usec: buffer.readInt32LE(4)
+      type: buffer.readUInt16LE(8)
+      code: buffer.readUInt16LE(10)
+      value: buffer.readInt32LE(12)
+    event = @pendingEvent || {xDelta: 0, yDelta: 0}
+    switch raw.type
+      when 0x00 # EV_SYN
+        event.time = raw.time.tv_sec * 1000 + raw.time.tv_usec / 1000 # ms
+        @pendingEvent = undefined
+        return event
+      when 0x02 # EV_REL
+        event.type = 'moved'
+        if (raw.code == 0x00) # REL_X
+          event.xDelta = raw.value
+        else if (raw.code == 0x01) # REL_Y
+          event.yDelta = raw.value
         else
           console.log(raw)
-      dev.pendingEvent = event
-      return undefined
-    super(dev, 16, 'r', parseMouse)
+      else
+        console.log(raw)
+    @pendingEvent = event
+    return undefined
 
 module.exports.Mouse = Mouse
 module.exports.Keyboard = Keyboard
