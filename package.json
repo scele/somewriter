@@ -4,7 +4,7 @@
   "description": "somewriter ==========",
   "main": "mouse.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "grunt test"
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,12 @@
   "homepage": "https://github.com/scele/somewriter",
   "dependencies": {
     "lodash": "^2.4.1"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.8.0",
+    "grunt": "^0.4.5",
+    "grunt-mocha-test": "^0.12.4",
+    "mocha": "^2.1.0",
+    "should": "^4.4.2"
   }
 }
