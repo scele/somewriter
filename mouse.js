@@ -233,12 +233,9 @@ function Typewriter(keyboard, mouse) {
   var FULL_SPACE = 118;
   var SMALL_ROLL = 90; // One line is 2 or 3 small rolls, depending on line spacing
   var STABLE_AFTER_KEYUP_TIME = 150;
-  var histogram = {};
-  var histogramNeg = {};
   var tt = this;
   var delta = {x: 0, y: 0};
-  var xabs = {min: Number.MAX_VALUE, max: Number.MIN_VALUE, cur: 0};
-  var stopTimeout, calibrateInterval, stableYTimeout;
+  var stableYTimeout;
   function stableX() {
     tt.x += Math.round(delta.x / HALF_SPACE) * 0.5;
     if (tt.x < 0) {
@@ -303,32 +300,15 @@ function Typewriter(keyboard, mouse) {
     }
   }
   function stop() {
-    if (delta.x >= 0)
-      histogram[delta.y] = (histogram[delta.y] || 0) + 1;
-    else
-      histogramNeg[-delta.y] = (histogramNeg[-delta.y] || 0) + 1;
     console.log(delta);
     delta = {x: 0, y: 0};
-    clearInterval(calibrateInterval);
-    calibrateInterval = undefined;
   }
   function platen(event) {
     delta.x -= event.yDelta; // Remap: x = -y
     delta.y += event.xDelta;
-    xabs.cur -= event.yDelta;
-    xabs.min = Math.min(xabs.min, xabs.cur);
-    xabs.max = Math.max(xabs.max, xabs.cur);
-    xabs.span = xabs.max - xabs.min;
-    xabs.percentage = Math.round((xabs.cur - xabs.min)/xabs.span * 10000) / 100;
-    //if (!calibrateInterval)
-    //  calibrateInterval = setInterval(console.log, 50, xabs);
-    //clearTimeout(stopTimeout);
-    //stopTimeout = setTimeout(stop, 100);
     clearTimeout(stableYTimeout);
     stableYTimeout = setTimeout(stableY, 50);
   }
-  //setInterval(console.log, 5000, histogram);
-  //setInterval(console.log, 5000, histogramNeg);
   this.keyboard = keyboard;
   this.mouse = mouse;
   this.x = 0;
@@ -343,32 +323,32 @@ Typewriter.prototype = Object.create(EventEmitter.prototype, {
 });
 
 
-
-/****************
- * Sample Usage *
- ****************/
-
-// read all mouse events from /dev/input/mice
-var mouse = new Mouse('/dev/input/event0');
-//mouse.on('button', console.log);
-//mouse.on('moved', console.log);
-
-var keyboard = new Keyboard('/dev/input/event1');
-//keyboard.on('key', console.log);
-
-var typewriter = new Typewriter(keyboard, mouse);
-typewriter.on('changed', function (event) { console.log(event.text); });
-
-// Blinking leds demo
-setTimeout(function () {
-  keyboard.led(0, 0);
-  keyboard.led(1, 0);
-  keyboard.led(2, 0);
-  var currentLed = 2;
-  function blink() {
-    keyboard.led(currentLed, 0);
-    currentLed = (currentLed + 1) % 6;
-    keyboard.led(currentLed, 1);
+function MouseHistogram(mouse) {
+  var delta = {x: 0, y: 0};
+  var stopTimeout;
+  function stop() {
+      this[delta.y] = (this[delta.y] || 0) + 1;
   }
-  var blinking = setInterval(blink, 200);
-}, 500);
+  mouse.on('moved', function (event) {
+    delta.x -= event.yDelta; // Remap: x = -y
+    delta.y += event.xDelta;
+    clearTimeout(stopTimeout);
+    stopTimeout = setTimeout(stop, 100);
+  });
+}
+
+function MouseCalibrator(mouse) {
+  var xabs = {min: Number.MAX_VALUE, max: Number.MIN_VALUE, cur: 0};
+  mouse.on('moved', function (event) {
+    xabs.cur -= event.yDelta;
+    xabs.min = Math.min(xabs.min, xabs.cur);
+    xabs.max = Math.max(xabs.max, xabs.cur);
+    xabs.span = xabs.max - xabs.min;
+    xabs.percentage = Math.round((xabs.cur - xabs.min)/xabs.span * 10000) / 100;
+    console.log(xabs);
+  });
+}
+
+module.exports.Mouse = Mouse
+module.exports.Keyboard = Keyboard
+module.exports.Typewriter = Typewriter

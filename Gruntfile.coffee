@@ -1,4 +1,9 @@
 module.exports = (grunt) ->
+  all = [
+    'coffee',
+    'copy',
+    'mochaTest',
+  ]
   grunt.initConfig
     pkg: grunt.file.readJSON('package.json')
     clean: ['out', 'dist']
@@ -11,11 +16,21 @@ module.exports = (grunt) ->
             'should'
           ]
         src: ['test/**/*.coffee']
+    coffee:
+      files:
+        expand: true,
+        src: ['*.coffee'],
+        dest: 'out/'
+        ext: '.js'
+    copy:
+      files:
+        expand: true,
+        src: ['mouse.js']
+        dest: 'out/',
 
+  grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-mocha-test')
+  grunt.loadNpmTasks('grunt-contrib-copy');
 
-  all = [
-    'mochaTest',
-  ]
   grunt.registerTask('default', all)
   grunt.registerTask('test', ['mochaTest'])
