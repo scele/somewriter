@@ -88,7 +88,7 @@ class Keyboard extends InputDevice
       type: buffer.readUInt16LE(8)
       code: buffer.readUInt16LE(10)
       value: buffer.readInt32LE(12)
-    event = dev.pendingEvent || {}
+    event = @pendingEvent || {}
     switch (raw.type)
       when 0x00 # EV_SYN
         event.time = raw.time.tv_sec * 1000 + raw.time.tv_usec / 1000 # ms
