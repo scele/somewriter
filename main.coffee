@@ -1,4 +1,5 @@
-{Mouse, Keyboard, Typewriter} = require('./mouse.js')
+{Typewriter} = require('./mouse.js')
+{Mouse, Keyboard} = require('./input')
 
 mouse = new Mouse('/dev/input/event0')
 
