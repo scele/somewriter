@@ -1,5 +1,6 @@
 somewriter
 ==========
+[![Build Status](https://travis-ci.org/scele/somewriter.svg)](https://travis-ci.org/scele/somewriter)
 
 Set up Raspberry Pi:
 --------------------
