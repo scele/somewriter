@@ -156,6 +156,7 @@ function Keyboard(dev) {
         event.code = raw.code;
         event.value = raw.value;
         event.char = codeMap[raw.code];
+        event.shiftChar = codeMapShift[raw.code];
         break;
       case 0x04: // EV_MSC
         if (raw.code == 0x04)
