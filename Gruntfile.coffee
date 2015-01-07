@@ -1,7 +1,6 @@
 module.exports = (grunt) ->
   all = [
     'coffee',
-    'copy',
     'mochaTest',
   ]
   grunt.initConfig
@@ -22,15 +21,9 @@ module.exports = (grunt) ->
         src: ['*.coffee'],
         dest: 'out/'
         ext: '.js'
-    copy:
-      files:
-        expand: true,
-        src: ['mouse.js']
-        dest: 'out/',
 
   grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-mocha-test')
-  grunt.loadNpmTasks('grunt-contrib-copy');
 
   grunt.registerTask('default', all)
   grunt.registerTask('test', ['mochaTest'])

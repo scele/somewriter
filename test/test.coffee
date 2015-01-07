@@ -3,7 +3,7 @@ should = require('should')
 _ = require('lodash')
 fs = require('fs')
 {EventEmitter} = require('events')
-testModule = rewire('../mouse.js')
+testModule = rewire('../typewriter')
 Typewriter = testModule.Typewriter
 
 #log = console.log
