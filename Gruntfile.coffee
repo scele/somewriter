@@ -11,8 +11,16 @@ module.exports = (grunt) ->
         options:
           reporter: 'spec'
           require: [
-            'coffee-script/register'
-            'should'
+            'coffee-script/register',
+            'should',
+          ]
+        src: ['test/**/*.coffee']
+      cov:
+        options:
+          reporter: 'mocha-lcov-reporter'
+          require: [
+            'coffee-coverage/register',
+            'should',
           ]
         src: ['test/**/*.coffee']
     coffee:
@@ -26,4 +34,5 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks('grunt-mocha-test')
 
   grunt.registerTask('default', all)
-  grunt.registerTask('test', ['mochaTest'])
+  grunt.registerTask('test', ['mochaTest:test'])
+  grunt.registerTask('coverage', ['mochaTest:cov'])
