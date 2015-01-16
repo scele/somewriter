@@ -2,8 +2,12 @@ EventEmitter = require('events').EventEmitter
 Keyboard = require('./input').Keyboard
 Mouse = require('./input').Mouse
 
+defaultTimeoutProvider =
+  set: setTimeout
+  clear: clearTimeout
+
 class Typewriter extends EventEmitter
-  constructor: (@keyboard, @mouse) ->
+  constructor: (@keyboard, @mouse, @timeout = defaultTimeoutProvider) ->
     @HALF_SPACE = 59
     @FULL_SPACE = 118
     @SMALL_ROLL = 90 # One line is 2 or 3 small rolls, depending on line spacing
@@ -44,7 +48,7 @@ class Typewriter extends EventEmitter
   keypress: (event) ->
     if (event.value == 0)
       # Key up: platen should be stable
-      setTimeout(@stableX.bind(this), @STABLE_AFTER_KEYUP_TIME)
+      @timeout.set(@stableX.bind(this), @STABLE_AFTER_KEYUP_TIME)
 
     if (event.value == 1)
       @stableY()
@@ -78,11 +82,11 @@ class Typewriter extends EventEmitter
   platen: (event) ->
     @delta.x -= event.yDelta # Remap: x = -y
     @delta.y += event.xDelta
-    clearTimeout(@stableYTimeout)
-    @stableYTimeout = setTimeout(@stableY.bind(this), 50)
+    @timeout.clear(@stableYTimeout)
+    @stableYTimeout = @timeout.set(@stableY.bind(this), 50)
 
 class MouseHistogram
-  constructor: (mouse) ->
+  constructor: (mouse, @timeout = defaultTimeoutProvider) ->
     delta = {x: 0, y: 0}
     stopTimeout = null
     stop = =>
@@ -90,8 +94,8 @@ class MouseHistogram
     mouse.on 'moved', (event) ->
       delta.x -= event.yDelta # Remap: x = -y
       delta.y += event.xDelta
-      clearTimeout(stopTimeout)
-      stopTimeout = setTimeout(stop, 100)
+      @timeout.clear(stopTimeout)
+      stopTimeout = @timeout.set(stop, 100)
 
 class MouseCalibrator
   constructor: (mouse) ->

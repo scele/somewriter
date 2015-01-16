@@ -1,4 +1,3 @@
-rewire = require('rewire')
 should = require('should')
 _ = require('lodash')
 fs = require('fs')
@@ -21,8 +20,8 @@ describe "Typewriter", ->
       timeouts = []
       lastEvent = null
 
-      testModule.__set__
-        setTimeout: (callback, ms, args...) ->
+      timeoutProvider =
+        set: (callback, ms, args...) ->
           log 'setTimeout called with ' + ms
           timeouts.push timeout =
             key: {}
@@ -31,7 +30,7 @@ describe "Typewriter", ->
             time: (lastEvent?.time or 0) + ms
           timeouts.sort (a,b) -> a.time < b.time
           return timeout.key
-        clearTimeout: (key) ->
+        clear: (key) ->
           log 'clearTimeout called with ' + key
           timeouts = (t for t in timeouts when t.key isnt key)
 
@@ -39,7 +38,7 @@ describe "Typewriter", ->
         logAndRet t, t.callback(t.args...) for t in timeouts
       split = (list, fn) -> [_.head(list, fn), _.tail(list, fn)]
 
-      typewriter = new Typewriter(mockKeyboard, mockMouse)
+      typewriter = new Typewriter(mockKeyboard, mockMouse, timeoutProvider)
 
       processEvent = (event) ->
         # Run expired timeouts
