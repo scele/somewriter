@@ -3,7 +3,7 @@ should = require('should')
 _ = require('lodash')
 fs = require('fs')
 {EventEmitter} = require('events')
-testModule = rewire('../typewriter')
+testModule = require('../src/typewriter')
 Typewriter = testModule.Typewriter
 
 #log = console.log
