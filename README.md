@@ -1,6 +1,7 @@
 somewriter
 ==========
 [![Build Status](https://travis-ci.org/scele/somewriter.svg)](https://travis-ci.org/scele/somewriter)
+[![Coverage Status](https://coveralls.io/repos/scele/somewriter/badge.svg?branch=master)](https://coveralls.io/r/scele/somewriter?branch=master)
 
 Set up Raspberry Pi:
 --------------------
