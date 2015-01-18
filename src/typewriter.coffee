@@ -7,7 +7,7 @@ defaultTimeoutProvider =
   clear: clearTimeout
 
 class Typewriter extends EventEmitter
-  constructor: (@keyboard, @mouse, @timeout = defaultTimeoutProvider) ->
+  constructor: (@timeout = defaultTimeoutProvider) ->
     @HALF_SPACE = 59
     @FULL_SPACE = 118
     @SMALL_ROLL = 90 # One line is 2 or 3 small rolls, depending on line spacing
@@ -18,8 +18,18 @@ class Typewriter extends EventEmitter
     @text = ''
     @delta = {x: 0, y: 0}
     @stableYTimeout = null
-    @keyboard.on('key', @keypress.bind(this))
-    @mouse.on('moved', @platen.bind(this))
+
+  setMouse: (m) ->
+    @mouse?.close()
+    @mouse = m
+    @mouse?.on('moved', @platen.bind(this))
+    @mouse?.on('error', (e) => @emit('error', e))
+
+  setKeyboard: (k) ->
+    @keyboard?.close()
+    @keyboard = k
+    @keyboard?.on('key', @keypress.bind(this))
+    @keyboard?.on('error', (e) => @emit('error', e))
 
   stableX: ->
     @x += Math.round(@delta.x / @HALF_SPACE) * 0.5

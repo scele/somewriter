@@ -33,7 +33,7 @@ class InputDevice extends EventEmitter
       @emit(event.type, event)
     @startRead() if @fd
   close: ->
-    fs.close(@fd)
+    fs.close(@fd, ->)
     @fd = undefined
 
 class Keyboard extends InputDevice

@@ -38,7 +38,9 @@ describe "Typewriter", ->
         logAndRet t, t.callback(t.args...) for t in timeouts
       split = (list, fn) -> [_.head(list, fn), _.tail(list, fn)]
 
-      typewriter = new Typewriter(mockKeyboard, mockMouse, timeoutProvider)
+      typewriter = new Typewriter(timeoutProvider)
+      typewriter.setKeyboard mockKeyboard
+      typewriter.setMouse mockMouse
 
       processEvent = (event) ->
         # Run expired timeouts
