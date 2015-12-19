@@ -26,6 +26,7 @@ sudo npm install -g grunt-cli
 git clone https://github.com/scele/somewriter.git
 
 cd somewriter
+sudo apt-get install libudev-dev
 npm install
 grunt
 ```
