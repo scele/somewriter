@@ -14,14 +14,24 @@ console.log('Server listening on port ' + port)
 # Socket.IO part
 io = require('socket.io')(server)
 
-status = [
-  { text: 'Connected', ok: true },
-  { text: 'Keyboard not connected', ok: false },
-  { text: 'Mouse not connected', ok: false },
-]
+desc = {
+  connected: ['Device offline', 'Device online'],
+  keyboard: ['Keyboard not connected', 'Keyboard connected'],
+  mouse: ['Mouse not connected', 'Mouse connected'],
+}
+
+status = {
+  connected: false,
+  keyboard: false,
+  mouse: false,
+}
 
 sendStatus = (socket) ->
-  socket.emit('status', status)
+  console.log(status)
+  int = (a) -> if a then 1 else 0
+  s = ({text: desc[key][int(value)], ok: value} for key, value of status)
+  console.log(s)
+  socket.emit('status', s)
 
 
 sendComments = (socket) ->
