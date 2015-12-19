@@ -1,6 +1,7 @@
 {Typewriter} = require('./typewriter')
 {Mouse, Keyboard} = require('./input')
 udev = require('udev')
+io = require('socket.io-client')
 
 
 # histogram = new MouseHistogram(mouse)
@@ -33,10 +34,22 @@ isKeyboard = (k) -> k.ID_INPUT_KEYBOARD and k.DEVNAME?.match /event\d+$/
 err = console.log
 clearErr = -> console.log "Ok!"
 
+status = {
+  mouse: false,
+  keyboard: false,
+}
+
+socket = io('http://localhost:8081')
+
+sendStatus = ->
+  socket.emit('status', status)
+
 probe = ->
   console.log "Probing..."
   [mouse, ...] = (dev for dev in udev.list() when isMouse dev)
   [keyboard, ...] = (dev for dev in udev.list() when isKeyboard dev)
+  status.mouse = !!mouse
+  status.keyboard = !!keyboard
   if mouse and keyboard
     clearErr()
     initTypewriter keyboard.DEVNAME, mouse.DEVNAME
@@ -44,6 +57,7 @@ probe = ->
     err "USB mouse not found"
   else
     err "USB keyboard not found"
+  sendStatus
 
 monitor = udev.monitor()
 monitor.on 'add', (dev) ->
