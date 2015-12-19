@@ -1,0 +1,35 @@
+{
+  "name": "somewriter",
+  "version": "1.0.0",
+  "description": "somewriter ==========",
+  "main": "mouse.js",
+  "scripts": {
+    "test": "grunt test",
+    "coveralls": "grunt coverage | ./node_modules/coveralls/bin/coveralls.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scele/somewriter.git"
+  },
+  "author": "Lauri Peltonen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/scele/somewriter/issues"
+  },
+  "homepage": "https://github.com/scele/somewriter",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "udev": "^0.1.0"
+  },
+  "devDependencies": {
+    "coffee-coverage": "^0.4.4",
+    "coffee-script": "^1.8.0",
+    "coveralls": "^2.11.2",
+    "grunt": "^0.4.5",
+    "grunt-coffee-coverage": "^0.1.5",
+    "grunt-contrib-coffee": "^0.12.0",
+    "grunt-mocha-test": "^0.12.4",
+    "mocha-lcov-reporter": "0.0.1",
+    "should": "^4.4.2"
+  }
+}
