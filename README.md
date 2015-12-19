@@ -10,6 +10,9 @@ Set up Raspberry Pi:
 # Set up WLAN:
 # http://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
 
+# Disable WLAN dongle power management to avoid dropped packets:
+sudo bash -c 'echo "options 8192cu rtw_power_mgnt=0 rtw_enusbss=0" > /etc/modprobe.d/8192cu.conf'
+
 sudo apt-get install vim
 
 ssh-keygen -t rsa
