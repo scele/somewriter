@@ -98,8 +98,14 @@ class Keyboard extends InputDevice
         event.type = 'key'
         event.code = raw.code
         event.value = raw.value
-        event.char = codeMap[raw.code][0]
-        event.shiftChar = codeMap[raw.code][1]
+        if (raw.code of codeMap)
+          event.char = codeMap[raw.code][0]
+          event.shiftChar = codeMap[raw.code][1]
+        else
+          console.log('Unknown keycode:')
+          console.log(raw)
+          event.char = '?'
+          event.shiftChar = '?'
       when 0x04 # EV_MSC
         if (raw.code == 0x04)
           event.scancode = raw.value
