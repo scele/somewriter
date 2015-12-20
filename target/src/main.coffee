@@ -3,6 +3,13 @@
 udev = require('udev')
 io = require('socket.io-client')
 
+os = require('os')
+ifaces = os.networkInterfaces()
+console.log(ifaces)
+ipv4 = (iface) -> 'IPv4' == iface.family && !iface.internal
+ips = (({iface: ifname, address: i.address} for i in ii when ipv4(i)) for ifname, ii of ifaces)
+ips = [].concat.apply([], ips)
+console.log(ips)
 
 # histogram = new MouseHistogram(mouse)
 # setInterval(console.log, 5000, histogram)
@@ -37,6 +44,7 @@ clearErr = -> console.log "Ok!"
 status = {
   mouse: false,
   keyboard: false,
+  ip: ips,
 }
 text = ''
 
