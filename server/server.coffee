@@ -62,10 +62,14 @@ io.on 'connection', (socket) ->
     fs.writeFile 'config.json', JSON.stringify(config, null, 4)
 
 # Typewriter connection
-ttio = require('socket.io')(8081)
+ttio = require('socket.io')(8081, {
+  pingTimeout: 2000,
+  pingInterval: 800,
+})
 
 ttio.on 'connection', (socket) ->
   console.log('Typewriter connected!')
+
   status.connected = true
   sendStatus(io)
   sendConfig(ttio)

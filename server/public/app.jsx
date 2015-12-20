@@ -78,14 +78,22 @@ var TypewriterStatus = React.createClass({
   },
   render: function() {
     var config = this.state.config;
+    var connected = this.state.status.connected;
+    var ips = '';
+    if (this.state.status.ip) {
+      ips = this.state.status.ip.map(function (ip) {
+        return (<div>{ip.iface}: {ip.address}</div>);
+      });
+    }
     return (
       <div className="commentBox">
         <h3>Status</h3>
-        <StatusItem good="Device online" bad="Device offline" value={this.state.status.connected} />
+        <StatusItem good="Device online" bad="Device offline" value={connected} />
         <StatusItem good="Keyboard connected" bad="Keyboard not connected" value={this.state.status.keyboard} />
         <StatusItem good="Mouse connected" bad="Mouse not connected" value={this.state.status.mouse} />
         <Paper text={this.state.text} x={this.state.status.x} y={this.state.status.y} />
         <div>x={this.state.status.x}, y={this.state.status.y}</div>
+        {ips}
         <CheckBox text="Ignore mouse" value="ignoreMouse" checked={config.ignoreMouse}
                   onChange={this.configChanged} />
       </div>
