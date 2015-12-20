@@ -19,50 +19,47 @@ console.log('Server listening on port ' + port)
 # Socket.IO part
 io = require('socket.io')(server)
 
-desc = {
-  connected: ['Device offline', 'Device online'],
-  keyboard: ['Keyboard not connected', 'Keyboard connected'],
-  mouse: ['Mouse not connected', 'Mouse connected'],
-}
-
 disconnected = {
   connected: false,
   keyboard: false,
   mouse: false,
+  x: 0,
+  y: 0,
 }
 
 status = extend {}, disconnected
+config = {}
+text = ''
 
-
-sendStatus = ->
+sendStatus = (socket) ->
   console.log(status)
-  int = (a) -> if a then 1 else 0
-  s = ({text: desc[key][int(value)], ok: value} for key, value of status)
-  console.log(s)
-  io.emit('status', s)
+  socket.emit('status', status)
 
-sendText = (text) ->
-  io.emit('text', text)
+sendText = (socket) ->
+  socket.emit('text', text)
 
+sendConfig = (socket) ->
+  socket.emit('config', config)
+  ttio.emit('config', config)
 
-sendComments = (socket) ->
-  fs.readFile '_comments.json', 'utf8', (err, comments) ->
-    if !err
-      comments = JSON.parse(comments)
-      socket.emit('comments', comments)
+try
+  configStr = fs.readFileSync 'config.json', 'utf8'
+  config = JSON.parse(configStr)
+catch
 
 io.on 'connection', (socket) ->
   console.log('New client connected!')
 
   sendStatus(socket)
+  sendConfig(socket)
+  sendText(socket)
 
-  socket.on 'newComment', (comment, callback) ->
-    fs.readFile '_comments.json', 'utf8', (err, comments) ->
-      comments = JSON.parse(comments)
-      comments.push(comment)
-      fs.writeFile '_comments.json', JSON.stringify(comments, null, 4), (err) ->
-        io.emit('comments', comments)
-        callback(err)
+  socket.on 'updateConfig', (newConfig, callback) ->
+    console.log newConfig
+    config = newConfig
+    sendConfig(io)
+    sendConfig(ttio)
+    fs.writeFile 'config.json', JSON.stringify(config, null, 4)
 
 # Typewriter connection
 ttio = require('socket.io')(8081)
@@ -70,18 +67,21 @@ ttio = require('socket.io')(8081)
 ttio.on 'connection', (socket) ->
   console.log('Typewriter connected!')
   status.connected = true
-  sendStatus()
+  sendStatus(io)
+  sendConfig(ttio)
 
   socket.on 'disconnect', () ->
     console.log('Typewriter disconnected')
     status = extend {}, disconnected
-    sendStatus()
+    sendStatus(io)
 
   socket.on 'status', (newStatus) ->
     console.log('Typewriter updated status')
     console.log(newStatus)
     extend status, newStatus
-    sendStatus()
-  socket.on 'text', (text) ->
+    sendStatus(io)
+
+  socket.on 'text', (newText) ->
+    text = newText
     console.log('Typewriter sent new text: ' + text)
-    sendText text
+    sendText(io)

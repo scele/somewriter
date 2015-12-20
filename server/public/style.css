@@ -1,2 +1,13 @@
 
 p { padding: 15px; }
+.cursor {
+  display: block;
+  width: 8px;
+  height: 16px;
+  background: black;
+  position: absolute;
+  opacity: 0.5;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+.paper { position: relative; }

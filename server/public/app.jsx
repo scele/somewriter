@@ -4,18 +4,58 @@ var io = require('socket.io-client');
 
 var socket = io();
 
+var CheckBox = React.createClass({
+  getInitialState: function () {
+    return {
+      value: '',
+      checked: false,
+      text: '',
+    };
+  },
+  handleChange: function(event) {
+    this.setState({value: event.target.value});
+  },
+  render: function() {
+    return (
+      <div className="checkbox">
+        <label>
+          <input type="checkbox" value={this.props.value} checked={this.props.checked}
+                 onChange={this.props.onChange} />
+          {this.props.text}
+        </label>
+      </div>
+    );
+  }
+});
+
 var StatusItem = React.createClass({
   render: function() {
-    var klass = this.props.item.ok ? 'bg-success' : 'bg-danger';
+    var klass = this.props.value ? 'bg-success' : 'bg-danger';
+    var text = this.props.value ? this.props.good : this.props.bad;
     return (
-      <p className={klass}>{this.props.item.text}</p>
+      <p className={klass}>{text}</p>
+    );
+  }
+});
+
+var Paper = React.createClass({
+  render: function() {
+    var style = {
+      top: this.props.y * 16,
+      left: this.props.x * 7.15, // for 13px <pre> font
+    };
+    return (
+      <div className="paper">
+        <pre>{this.props.text}</pre>
+        <div className="cursor" style={style}></div>
+      </div>
     );
   }
 });
 
 var TypewriterStatus = React.createClass({
   getInitialState: function () {
-    return {};
+    return {config:{}, status: {}};
   },
   componentDidMount: function () {
     var that = this;
@@ -27,91 +67,33 @@ var TypewriterStatus = React.createClass({
     socket.on('text', function (text) {
       that.setState({ text: text });
     });
-  },
-  render: function() {
-    return (
-      <div className="commentBox">
-        <h3>Status:</h3>
-        <StatusList items={this.state.status}/>
-        <p>{this.state.text}</p>
-      </div>
-    );
-  }
-});
-
-var StatusList = React.createClass({
-  render: function () {
-    var Items = (<div>Loading status...</div>);
-    if (this.props.items) {
-      Items = this.props.items.map(function (item) {
-        return (<StatusItem item={item} />);
-      });
-    }
-    return (
-      <div className="statusList">
-        {Items}
-      </div>
-    );
-  }
-});
-
-
-var CommentBox = React.createClass({
-  getInitialState: function () {
-    return {
-      comments: null
-    };
-  },
-  componentDidMount: function () {
-    var that = this;
-    this.socket = io();
-    this.socket.on('comments', function (comments) {
-      that.setState({ comments: comments });
-    });
-    this.socket.emit('fetchComments');
-  },
-  submitComment: function (comment, callback) {
-    this.socket.emit('newComment', comment, function (err) {
-      if (err)
-        return  console.error('New comment error:', err);
-      callback();
+    socket.on('config', function (config) {
+      that.setState({ config: config });
     });
   },
+  configChanged: function (event) {
+    var config = {};
+    config[event.target.value] = event.target.checked;
+    socket.emit('updateConfig', config);
+  },
   render: function() {
+    var config = this.state.config;
     return (
       <div className="commentBox">
-        <h3>Comments:</h3>
-        <CommentList comments={this.state.comments}/>
-        <CommentForm submitComment={this.submitComment}/>
+        <h3>Status</h3>
+        <StatusItem good="Device online" bad="Device offline" value={this.state.status.connected} />
+        <StatusItem good="Keyboard connected" bad="Keyboard not connected" value={this.state.status.keyboard} />
+        <StatusItem good="Mouse connected" bad="Mouse not connected" value={this.state.status.mouse} />
+        <Paper text={this.state.text} x={this.state.status.x} y={this.state.status.y} />
+        <div>x={this.state.status.x}, y={this.state.status.y}</div>
+        <CheckBox text="Ignore mouse" value="ignoreMouse" checked={config.ignoreMouse}
+                  onChange={this.configChanged} />
       </div>
     );
   }
 });
-var CommentList = React.createClass({
-  render: function () {
-    var Comments = (<div>Loading comments...</div>);
-    if (this.props.comments) {
-      Comments = this.props.comments.map(function (comment) {
-        return (<Comment comment={comment} />);
-      });
-    }
-    return (
-      <div className="commentList">
-        {Comments}
-      </div>
-    );
-  }
-});
-var Comment = React.createClass({
-  render: function () {
-    return (
-      <div className="comment">
-        <span className="author">{this.props.comment.author}</span> said:<br/>
-        <div className="body">{this.props.comment.text}</div>
-      </div>
-    );
-  }
-});
+
+/*
 var CommentForm = React.createClass({
   handleSubmit: function (e) {
     e.preventDefault();
@@ -139,6 +121,7 @@ var CommentForm = React.createClass({
     );
   }
 });
+*/
 
 ReactDOM.render(
   <div>
