@@ -38,11 +38,24 @@ status = {
   mouse: false,
   keyboard: false,
 }
+text = ''
 
-socket = io('http://localhost:8081')
+socket = io('http://192.168.0.20:8081')
+
+socket.on 'connect', ->
+  sendStatus()
+  sendText()
+
+socket.on 'config', (config) ->
+  typewriter.ignoreMouse = config.ignoreMouse
 
 sendStatus = ->
+  console.log('Sending status:')
+  console.log(status)
   socket.emit('status', status)
+
+sendText = ->
+  socket.emit 'text', text
 
 probe = ->
   console.log "Probing..."
@@ -57,13 +70,20 @@ probe = ->
     err "USB mouse not found"
   else
     err "USB keyboard not found"
-  sendStatus
+  sendStatus()
 
 monitor = udev.monitor()
 monitor.on 'add', (dev) ->
   probe() if (isMouse dev) or (isKeyboard dev)
 
 typewriter = new Typewriter
-typewriter.on('changed', (event) -> console.log(event.text))
+typewriter.on 'changed', (event) ->
+  text = event.text
+  console.log(event.text)
+  sendText()
+typewriter.on 'moved', (event) ->
+  status.x = event.x
+  status.y = event.y
+  sendStatus()
 typewriter.on('error', (event) -> probe())
 probe()

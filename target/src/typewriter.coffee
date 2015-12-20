@@ -18,6 +18,7 @@ class Typewriter extends EventEmitter
     @text = ''
     @delta = {x: 0, y: 0}
     @stableYTimeout = null
+    @ignoreMouse = false
 
   setMouse: (m) ->
     @mouse?.close()
@@ -31,6 +32,13 @@ class Typewriter extends EventEmitter
     @keyboard?.on('key', @keypress.bind(this))
     @keyboard?.on('error', (e) => @emit('error', e))
 
+  emitMoved: ->
+    event =
+      type: 'moved'
+      x: @x
+      y: @y
+    @emit(event.type, event)
+
   stableX: ->
     @x += Math.round(@delta.x / @HALF_SPACE) * 0.5
     if (@x < 0)
@@ -41,6 +49,7 @@ class Typewriter extends EventEmitter
       @x += d
     @delta.x = 0
     console.log('Moved cursor horizontally to ' + @x + ',' + @y)
+    @emitMoved()
 
   stableY: ->
     console.log('delta.y: ' + @delta.y)
@@ -54,6 +63,7 @@ class Typewriter extends EventEmitter
       @y = 0
     @delta.y = 0
     if d then console.log('Moved cursor vertically ' + d + ' lines to ' + @x + ',' + @y)
+    @emitMoved()
 
   keypress: (event) ->
     if (event.value == 0)
@@ -88,6 +98,7 @@ class Typewriter extends EventEmitter
         type: 'changed'
         text: @text
       @emit(event.type, event)
+      @x++ if @ignoreMouse
 
   platen: (event) ->
     @delta.x -= event.yDelta # Remap: x = -y
