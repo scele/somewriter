@@ -2,6 +2,7 @@
 path = require('path')
 fs = require('fs')
 express = require('express')
+Twitter = require('twitter')
 
 extend = (object, properties) ->
   for key, val of properties
@@ -42,6 +43,13 @@ sendConfig = (socket) ->
   socket.emit('config', config)
   ttio.emit('config', config)
 
+twitterConfig = JSON.parse(fs.readFileSync path.join(__dirname, 'twitter.json'), 'utf8')
+twitter = new Twitter(twitterConfig)
+twitter.get 'account/verify_credentials', (err, response, req) ->
+  if (!err)
+    status.twitter = response
+    status.twitter.widget = twitterConfig.widget
+
 try
   configStr = fs.readFileSync 'config.json', 'utf8'
   config = JSON.parse(configStr)
@@ -60,6 +68,11 @@ io.on 'connection', (socket) ->
     sendConfig(io)
     sendConfig(ttio)
     fs.writeFile 'config.json', JSON.stringify(config, null, 4)
+
+  socket.on 'tweet', (tweet) ->
+    twitter.post 'statuses/update', {status: tweet}, (error, tweet, response) ->
+      console.log(tweet)
+      console.log(response)
 
 # Typewriter connection
 ttio = require('socket.io')(8081, {

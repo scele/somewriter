@@ -52,7 +52,7 @@ var Paper = React.createClass({
     );
   }
 });
-
+var twitterTimelineCreated = false;
 var TypewriterStatus = React.createClass({
   getInitialState: function () {
     return {config:{}, status: {}};
@@ -63,6 +63,10 @@ var TypewriterStatus = React.createClass({
       console.log('got status');
       console.log(status);
       that.setState({ status: status });
+      if (status.twitter && !twitterTimelineCreated) {
+        twitterTimelineCreated = true;
+        twttr.widgets.createTimeline(status.twitter.widget, document.getElementById("twitter"));
+      }
     });
     socket.on('text', function (text) {
       that.setState({ text: text });
@@ -75,6 +79,11 @@ var TypewriterStatus = React.createClass({
     var config = {};
     config[event.target.value] = event.target.checked;
     socket.emit('updateConfig', config);
+  },
+  onClick: function (event) {
+    if (this.state.text.length) {
+      socket.emit('tweet', this.state.text);
+    }
   },
   render: function() {
     var config = this.state.config;
@@ -96,6 +105,8 @@ var TypewriterStatus = React.createClass({
         {ips}
         <CheckBox text="Ignore mouse" value="ignoreMouse" checked={config.ignoreMouse}
                   onChange={this.configChanged} />
+        <input className="btn btn-default" type="button" onClick={this.onClick} value="Tweet" />
+        <div id="twitter"></div>
       </div>
     );
   }
