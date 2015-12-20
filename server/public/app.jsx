@@ -2,6 +2,8 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var io = require('socket.io-client');
 
+var socket = io();
+
 var StatusItem = React.createClass({
   render: function() {
     var klass = this.props.item.ok ? 'bg-success' : 'bg-danger';
@@ -13,23 +15,25 @@ var StatusItem = React.createClass({
 
 var TypewriterStatus = React.createClass({
   getInitialState: function () {
-    return {
-      comments: null
-    };
+    return {};
   },
   componentDidMount: function () {
     var that = this;
-    this.socket = io();
-    this.socket.on('status', function (status) {
+    socket.on('status', function (status) {
+      console.log('got status');
+      console.log(status);
       that.setState({ status: status });
     });
-    this.socket.emit('fetchStatus');
+    socket.on('text', function (text) {
+      that.setState({ text: text });
+    });
   },
   render: function() {
     return (
       <div className="commentBox">
         <h3>Status:</h3>
         <StatusList items={this.state.status}/>
+        <p>{this.state.text}</p>
       </div>
     );
   }

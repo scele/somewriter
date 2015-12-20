@@ -3,6 +3,11 @@ path = require('path')
 fs = require('fs')
 express = require('express')
 
+extend = (object, properties) ->
+  for key, val of properties
+    object[key] = val
+  object
+
 # Server part
 app = express()
 app.use('/', express.static(path.join(__dirname, '..')))
@@ -20,18 +25,24 @@ desc = {
   mouse: ['Mouse not connected', 'Mouse connected'],
 }
 
-status = {
+disconnected = {
   connected: false,
   keyboard: false,
   mouse: false,
 }
 
-sendStatus = (socket) ->
+status = extend {}, disconnected
+
+
+sendStatus = ->
   console.log(status)
   int = (a) -> if a then 1 else 0
   s = ({text: desc[key][int(value)], ok: value} for key, value of status)
   console.log(s)
-  socket.emit('status', s)
+  io.emit('status', s)
+
+sendText = (text) ->
+  io.emit('text', text)
 
 
 sendComments = (socket) ->
@@ -43,9 +54,7 @@ sendComments = (socket) ->
 io.on 'connection', (socket) ->
   console.log('New client connected!')
 
-  socket.on 'fetchStatus', () ->
-    sendStatus(socket)
-
+  sendStatus(socket)
 
   socket.on 'newComment', (comment, callback) ->
     fs.readFile '_comments.json', 'utf8', (err, comments) ->
@@ -60,6 +69,19 @@ ttio = require('socket.io')(8081)
 
 ttio.on 'connection', (socket) ->
   console.log('Typewriter connected!')
-  status[0].ok = true
-  sendStatus
+  status.connected = true
+  sendStatus()
 
+  socket.on 'disconnect', () ->
+    console.log('Typewriter disconnected')
+    status = extend {}, disconnected
+    sendStatus()
+
+  socket.on 'status', (newStatus) ->
+    console.log('Typewriter updated status')
+    console.log(newStatus)
+    extend status, newStatus
+    sendStatus()
+  socket.on 'text', (text) ->
+    console.log('Typewriter sent new text: ' + text)
+    sendText text
