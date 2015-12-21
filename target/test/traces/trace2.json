@@ -1,0 +1,940 @@
+{
+    "realoutput": "qwertyuiop-",
+    "output": "qw er tyuio-?",
+    "events": [
+        {
+            "xDelta": 1,
+            "yDelta": -4,
+            "type": "moved",
+            "time": 1450734370210.941,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458772,
+            "type": "key",
+            "code": 16,
+            "value": 1,
+            "char": "q",
+            "shiftChar": "Q",
+            "time": 1450734370215.034,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": -9,
+            "yDelta": -53,
+            "type": "moved",
+            "time": 1450734370226.975,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 2,
+            "yDelta": 6,
+            "type": "moved",
+            "time": 1450734370242.978,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 2,
+            "yDelta": 6,
+            "type": "moved",
+            "time": 1450734370258.959,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458772,
+            "type": "key",
+            "code": 16,
+            "value": 0,
+            "char": "q",
+            "shiftChar": "Q",
+            "time": 1450734370263.023,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -1,
+            "type": "moved",
+            "time": 1450734371475.099,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -2,
+            "type": "moved",
+            "time": 1450734371491.108,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -1,
+            "type": "moved",
+            "time": 1450734371507.107,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -10,
+            "type": "moved",
+            "time": 1450734371523.109,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -47,
+            "type": "moved",
+            "time": 1450734371539.112,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 2,
+            "yDelta": -1,
+            "type": "moved",
+            "time": 1450734371555.111,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": 7,
+            "type": "moved",
+            "time": 1450734371571.117,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": -24,
+            "type": "moved",
+            "time": 1450734372643.248,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458778,
+            "type": "key",
+            "code": 17,
+            "value": 1,
+            "char": "w",
+            "shiftChar": "W",
+            "time": 1450734372647.318,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": -5,
+            "yDelta": -44,
+            "type": "moved",
+            "time": 1450734372659.276,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": 14,
+            "type": "moved",
+            "time": 1450734372675.347,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": 1,
+            "type": "moved",
+            "time": 1450734372691.263,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458778,
+            "type": "key",
+            "code": 17,
+            "value": 0,
+            "char": "w",
+            "shiftChar": "W",
+            "time": 1450734372743.293,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -4,
+            "type": "moved",
+            "time": 1450734372787.273,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -5,
+            "type": "moved",
+            "time": 1450734372803.271,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -16,
+            "type": "moved",
+            "time": 1450734372819.278,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": -43,
+            "type": "moved",
+            "time": 1450734372835.272,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -3,
+            "yDelta": 11,
+            "type": "moved",
+            "time": 1450734372851.277,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": 4,
+            "type": "moved",
+            "time": 1450734372867.275,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 3,
+            "yDelta": -2,
+            "type": "moved",
+            "time": 1450734373667.371,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458760,
+            "type": "key",
+            "code": 18,
+            "value": 1,
+            "char": "e",
+            "shiftChar": "E",
+            "time": 1450734373671.43,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": -3,
+            "yDelta": -54,
+            "type": "moved",
+            "time": 1450734373683.406,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": -6,
+            "type": "moved",
+            "time": 1450734373699.399,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": 4,
+            "type": "moved",
+            "time": 1450734373715.391,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458760,
+            "type": "key",
+            "code": 18,
+            "value": 0,
+            "char": "e",
+            "shiftChar": "E",
+            "time": 1450734373767.415,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -1,
+            "type": "moved",
+            "time": 1450734374627.492,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": -1,
+            "type": "moved",
+            "time": 1450734374643.504,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -11,
+            "type": "moved",
+            "time": 1450734374659.506,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -2,
+            "yDelta": -45,
+            "type": "moved",
+            "time": 1450734374675.499,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -1,
+            "type": "moved",
+            "time": 1450734374691.501,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 2,
+            "yDelta": 5,
+            "type": "moved",
+            "time": 1450734374707.512,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458773,
+            "type": "key",
+            "code": 19,
+            "value": 1,
+            "char": "r",
+            "shiftChar": "R",
+            "time": 1450734375879.682,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": -40,
+            "type": "moved",
+            "time": 1450734375891.673,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -8,
+            "yDelta": -21,
+            "type": "moved",
+            "time": 1450734375907.681,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 4,
+            "yDelta": 10,
+            "type": "moved",
+            "time": 1450734375923.663,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -3,
+            "yDelta": 0,
+            "type": "moved",
+            "time": 1450734375939.657,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458773,
+            "type": "key",
+            "code": 19,
+            "value": 0,
+            "char": "r",
+            "shiftChar": "R",
+            "time": 1450734375959.695,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": -6,
+            "type": "moved",
+            "time": 1450734375971.668,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -23,
+            "type": "moved",
+            "time": 1450734375987.66,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -2,
+            "yDelta": -44,
+            "type": "moved",
+            "time": 1450734376003.669,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": 14,
+            "type": "moved",
+            "time": 1450734376019.673,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": 1,
+            "type": "moved",
+            "time": 1450734376035.666,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": -11,
+            "type": "moved",
+            "time": 1450734376963.78,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458775,
+            "type": "key",
+            "code": 20,
+            "value": 1,
+            "char": "t",
+            "shiftChar": "T",
+            "time": 1450734376967.853,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": -54,
+            "type": "moved",
+            "time": 1450734376979.81,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": 1,
+            "type": "moved",
+            "time": 1450734376995.789,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 3,
+            "yDelta": 3,
+            "type": "moved",
+            "time": 1450734377011.796,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": 0,
+            "type": "moved",
+            "time": 1450734377027.799,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458775,
+            "type": "key",
+            "code": 20,
+            "value": 0,
+            "char": "t",
+            "shiftChar": "T",
+            "time": 1450734377031.852,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": -2,
+            "yDelta": -4,
+            "type": "moved",
+            "time": 1450734377059.791,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -28,
+            "type": "moved",
+            "time": 1450734377075.804,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -3,
+            "yDelta": -33,
+            "type": "moved",
+            "time": 1450734377091.807,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": 13,
+            "type": "moved",
+            "time": 1450734377107.811,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 2,
+            "yDelta": -6,
+            "type": "moved",
+            "time": 1450734377731.873,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458780,
+            "type": "key",
+            "code": 21,
+            "value": 1,
+            "char": "y",
+            "shiftChar": "Y",
+            "time": 1450734377735.963,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 2,
+            "yDelta": -48,
+            "type": "moved",
+            "time": 1450734377747.881,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -10,
+            "yDelta": -21,
+            "type": "moved",
+            "time": 1450734377763.909,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 9,
+            "yDelta": 7,
+            "type": "moved",
+            "time": 1450734377779.911,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": -5,
+            "type": "moved",
+            "time": 1450734377811.891,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458780,
+            "type": "key",
+            "code": 21,
+            "value": 0,
+            "char": "y",
+            "shiftChar": "Y",
+            "time": 1450734377815.954,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -46,
+            "type": "moved",
+            "time": 1450734377827.897,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": -3,
+            "type": "moved",
+            "time": 1450734377843.895,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": 7,
+            "type": "moved",
+            "time": 1450734377859.896,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": 1,
+            "type": "moved",
+            "time": 1450734377891.898,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -12,
+            "type": "moved",
+            "time": 1450734378884.014,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458776,
+            "type": "key",
+            "code": 22,
+            "value": 1,
+            "char": "u",
+            "shiftChar": "U",
+            "time": 1450734378888.166,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": -4,
+            "yDelta": -57,
+            "type": "moved",
+            "time": 1450734378900.036,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -3,
+            "yDelta": 3,
+            "type": "moved",
+            "time": 1450734378916.051,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 7,
+            "yDelta": 6,
+            "type": "moved",
+            "time": 1450734378932.181,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -3,
+            "yDelta": 0,
+            "type": "moved",
+            "time": 1450734378948.036,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": -2,
+            "type": "moved",
+            "time": 1450734378964.029,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458776,
+            "type": "key",
+            "code": 22,
+            "value": 0,
+            "char": "u",
+            "shiftChar": "U",
+            "time": 1450734378968.093,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -23,
+            "type": "moved",
+            "time": 1450734378980.04,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": -39,
+            "type": "moved",
+            "time": 1450734378996.042,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -2,
+            "yDelta": 11,
+            "type": "moved",
+            "time": 1450734379012.054,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 4,
+            "yDelta": 1,
+            "type": "moved",
+            "time": 1450734379028.045,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 4,
+            "yDelta": 0,
+            "type": "moved",
+            "time": 1450734379412.083,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": -32,
+            "type": "moved",
+            "time": 1450734379428.089,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458764,
+            "type": "key",
+            "code": 23,
+            "value": 1,
+            "char": "i",
+            "shiftChar": "I",
+            "time": 1450734379432.13,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": -10,
+            "yDelta": -28,
+            "type": "moved",
+            "time": 1450734379444.114,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 9,
+            "yDelta": 12,
+            "type": "moved",
+            "time": 1450734379460.12,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": -1,
+            "type": "moved",
+            "time": 1450734379492.098,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458764,
+            "type": "key",
+            "code": 23,
+            "value": 0,
+            "char": "i",
+            "shiftChar": "I",
+            "time": 1450734379496.16,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": -8,
+            "type": "moved",
+            "time": 1450734379508.105,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -36,
+            "type": "moved",
+            "time": 1450734379524.103,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -3,
+            "yDelta": -19,
+            "type": "moved",
+            "time": 1450734379540.098,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": 9,
+            "type": "moved",
+            "time": 1450734379556.111,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458770,
+            "type": "key",
+            "code": 24,
+            "value": 1,
+            "char": "o",
+            "shiftChar": "O",
+            "time": 1450734379896.182,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": -25,
+            "type": "moved",
+            "time": 1450734379908.176,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -5,
+            "yDelta": -50,
+            "type": "moved",
+            "time": 1450734379924.173,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -2,
+            "yDelta": 8,
+            "type": "moved",
+            "time": 1450734379940.158,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -3,
+            "yDelta": -20,
+            "type": "moved",
+            "time": 1450734379972.168,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -2,
+            "yDelta": -37,
+            "type": "moved",
+            "time": 1450734379988.164,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458770,
+            "type": "key",
+            "code": 24,
+            "value": 0,
+            "char": "o",
+            "shiftChar": "O",
+            "time": 1450734379992.241,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": 12,
+            "type": "moved",
+            "time": 1450734380004.166,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": 2,
+            "type": "moved",
+            "time": 1450734380020.16,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -1,
+            "type": "moved",
+            "time": 1450734380468.209,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458771,
+            "type": "key",
+            "code": 25,
+            "value": 1,
+            "char": "-",
+            "shiftChar": "=",
+            "time": 1450734380472.35,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -42,
+            "type": "moved",
+            "time": 1450734380484.233,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -9,
+            "yDelta": -26,
+            "type": "moved",
+            "time": 1450734380500.245,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 7,
+            "yDelta": 13,
+            "type": "moved",
+            "time": 1450734380516.223,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": 1,
+            "type": "moved",
+            "time": 1450734380532.228,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458771,
+            "type": "key",
+            "code": 25,
+            "value": 0,
+            "char": "-",
+            "shiftChar": "=",
+            "time": 1450734380568.263,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 1,
+            "yDelta": -2,
+            "type": "moved",
+            "time": 1450734380580.286,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 3,
+            "yDelta": -36,
+            "type": "moved",
+            "time": 1450734380596.237,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -3,
+            "yDelta": -18,
+            "type": "moved",
+            "time": 1450734380612.243,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": 9,
+            "type": "moved",
+            "time": 1450734380628.232,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": 0,
+            "type": "moved",
+            "time": 1450734380660.233,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -2,
+            "yDelta": -6,
+            "type": "moved",
+            "time": 1450734380996.273,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458799,
+            "type": "key",
+            "code": 26,
+            "value": 1,
+            "char": "?",
+            "shiftChar": "?",
+            "time": 1450734381000.349,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": -1,
+            "yDelta": -55,
+            "type": "moved",
+            "time": 1450734381012.295,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -6,
+            "yDelta": -3,
+            "type": "moved",
+            "time": 1450734381028.309,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 3,
+            "yDelta": 7,
+            "type": "moved",
+            "time": 1450734381044.312,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "scancode": 458799,
+            "type": "key",
+            "code": 26,
+            "value": 0,
+            "char": "?",
+            "shiftChar": "?",
+            "time": 1450734381064.328,
+            "dev": "/dev/input/event1"
+        },
+        {
+            "xDelta": 3,
+            "yDelta": -3,
+            "type": "moved",
+            "time": 1450734381076.314,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 0,
+            "yDelta": -33,
+            "type": "moved",
+            "time": 1450734381092.301,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": -3,
+            "yDelta": -22,
+            "type": "moved",
+            "time": 1450734381108.309,
+            "dev": "/dev/input/event0"
+        },
+        {
+            "xDelta": 3,
+            "yDelta": 10,
+            "type": "moved",
+            "time": 1450734381124.304,
+            "dev": "/dev/input/event0"
+        }
+    ]
+}
