@@ -45,6 +45,9 @@ status = {
   mouse: false,
   keyboard: false,
   ip: ips,
+  x: 0,
+  y: 0,
+  text: '',
 }
 text = ''
 
@@ -52,18 +55,20 @@ socket = io('http://192.168.0.20:8081')
 
 socket.on 'connect', ->
   sendStatus()
-  sendText()
 
 socket.on 'config', (config) ->
   typewriter.ignoreMouse = config.ignoreMouse
+
+socket.on 'resetText', ->
+  typewriter.resetText()
+
+socket.on 'resetPosition', ->
+  typewriter.resetPosition()
 
 sendStatus = ->
   console.log('Sending status:')
   console.log(status)
   socket.emit('status', status)
-
-sendText = ->
-  socket.emit 'text', text
 
 probe = ->
   console.log "Probing..."
@@ -86,9 +91,9 @@ monitor.on 'add', (dev) ->
 
 typewriter = new Typewriter
 typewriter.on 'changed', (event) ->
-  text = event.text
+  status.text = event.text
   console.log(event.text)
-  sendText()
+  sendStatus()
 typewriter.on 'moved', (event) ->
   status.x = event.x
   status.y = event.y

@@ -32,6 +32,16 @@ class Typewriter extends EventEmitter
     @keyboard?.on('key', @keypress.bind(this))
     @keyboard?.on('error', (e) => @emit('error', e))
 
+  resetText: ->
+    @chars = [[]]
+    @updateText()
+
+  resetPosition: ->
+    @x = 0
+    @y = 0
+    @delta = {x: 0, y: 0}
+    @emitMoved()
+
   emitMoved: ->
     event =
       type: 'moved'
@@ -40,6 +50,7 @@ class Typewriter extends EventEmitter
     @emit(event.type, event)
 
   stableX: ->
+    oldX = @x
     @x += Math.round(@delta.x / @HALF_SPACE) * 0.5
     if (@x < 0)
       d = -Math.ceil(@x)
@@ -47,23 +58,41 @@ class Typewriter extends EventEmitter
       spaces = Array(d)
       l.unshift(spaces...) for l in @chars
       @x += d
+      @updateText()
     @delta.x = 0
     console.log('Moved cursor horizontally to ' + @x + ',' + @y)
-    @emitMoved()
+    @emitMoved() if oldX != @x
 
   stableY: ->
+    oldY = @y
     console.log('delta.y: ' + @delta.y)
     d = Math.round(@delta.y / @SMALL_ROLL)
     @y += d
     if @y < 0
       dd = -@y
-      console.log('Shifting everything to the right by ' + dd)
+      console.log('Shifting everything down by ' + dd)
       while (dd--)
         @chars.unshift([])
       @y = 0
+      @updateText()
     @delta.y = 0
     if d then console.log('Moved cursor vertically ' + d + ' lines to ' + @x + ',' + @y)
-    @emitMoved()
+    @emitMoved() if oldY != @y
+
+  updateText: ->
+      # Join chars to form a list of line strings.
+      lines = ((char or ' ' for char in line).join('') for line in @chars)
+      # For each empty line, remove two consecutive empty lines.
+      #i = 0
+      #while i < lines.length
+      #  lines.splice(i, 1) for j in [0..2] when !lines[i]
+      #  i++
+
+      @text = lines.join('\n')
+      event =
+        type: 'changed'
+        text: @text
+      @emit(event.type, event)
 
   keypress: (event) ->
     if (event.value == 0)
@@ -81,24 +110,14 @@ class Typewriter extends EventEmitter
         console.log('Adjusting half step from ' + @x + ' to ' + Math.ceil(@x))
         @x = Math.ceil(@x)
 
-      if (!(@y of @chars))
-        @chars[@y] = []
+      for i in [0..@y] when !(i of @chars)
+        @chars[i] = []
       @chars[@y][@x] = event.char
 
-      # Join chars to form a list of line strings.
-      lines = ((char or ' ' for char in line).join('') for line in @chars)
-      # For each empty line, remove two consecutive empty lines.
-      i = 0
-      while i < lines.length
-        lines.splice(i, 1) for j in [0..2] when !lines[i]
-        i++
-
-      @text = lines.join('\n')
-      event =
-        type: 'changed'
-        text: @text
-      @emit(event.type, event)
-      @x++ if @ignoreMouse
+      @updateText()
+      if @ignoreMouse
+        @x++
+        @emitMoved()
 
   platen: (event) ->
     @delta.x -= event.yDelta # Remap: x = -y
