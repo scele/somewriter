@@ -18,6 +18,7 @@ class Typewriter extends EventEmitter
     @text = ''
     @delta = {x: 0, y: 0}
     @stableYTimeout = null
+    @unstableXTimeout = null
     @ignoreMouse = false
 
   setMouse: (m) ->
@@ -63,6 +64,22 @@ class Typewriter extends EventEmitter
     console.log('Moved cursor horizontally to ' + @x + ',' + @y)
     @emitMoved() if oldX != @x
 
+  unstableX: ->
+    oldX = @x
+    deltaUnits = @delta.x / @HALF_SPACE * 0.5;
+    idelta = Math.round(deltaUnits)
+    console.log("unstableX @x=" + @x + " idelta=" + idelta + " @delta.x=" + @delta.x);
+    @delta.x -= idelta / 0.5 * @HALF_SPACE;
+    @x += idelta
+    if (@x < 0)
+      d = -Math.ceil(@x)
+      console.log('Shifting everything to the right by ' + d)
+      spaces = Array(d)
+      l.unshift(spaces...) for l in @chars
+      @x += d
+      @updateText()
+    @emitMoved() if oldX != @x
+
   stableY: ->
     oldY = @y
     console.log('delta.y: ' + @delta.y)
@@ -105,7 +122,7 @@ class Typewriter extends EventEmitter
       # a keystroke might race with the keydown signal (and it does).
       # On the other hand, we need to update the x position in case we
       # have been scrolling left and right without typing.
-      #@stableX()
+      #@unstableX()
       if (@x != Math.ceil(@x))
         console.log('Adjusting half step from ' + @x + ' to ' + Math.ceil(@x))
         @x = Math.ceil(@x)
@@ -124,6 +141,8 @@ class Typewriter extends EventEmitter
     @delta.y += event.xDelta
     @timeout.clear(@stableYTimeout)
     @stableYTimeout = @timeout.set(@stableY.bind(this), 50)
+    @timeout.clear(@unstableXTimeout)
+    @unstableXTimeout = @timeout.set(@unstableX.bind(this), 50)
 
 class MouseHistogram
   constructor: (mouse, @timeout = defaultTimeoutProvider) ->
