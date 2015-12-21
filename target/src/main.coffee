@@ -2,6 +2,7 @@
 {Mouse, Keyboard} = require('./input')
 udev = require('udev')
 io = require('socket.io-client')
+fs = require('fs')
 
 os = require('os')
 ifaces = os.networkInterfaces()
@@ -18,9 +19,32 @@ console.log(ips)
 
 # keyboard.on('key', console.log)
 
+keyboard = 0
+mouse = 0
+
+logIndex = 1
+logEvents = []
+logEvent = (event) ->
+  logEvents.push(event)
+
+flushLog = ->
+  log = { output: status.text, events: logEvents }
+  filename = 'trace' + logIndex + '.json'
+  fs.writeFileSync filename, JSON.stringify(log, null, 4)
+  console.log('Wrote log to ' + filename)
+  logEvents = []
+  logIndex++
+
 initTypewriter = (k, m) ->
-  typewriter.setKeyboard new Keyboard k
-  typewriter.setMouse new Mouse m
+  keyboard.close() if keyboard
+  keyboard = new Keyboard k
+  typewriter.setKeyboard keyboard
+  keyboard.on 'key', logEvent
+
+  mouse.close() if mouse
+  mouse = new Mouse m
+  typewriter.setMouse mouse
+  mouse.on 'moved', logEvent
 
 ## Blinking leds
 #setTimeout(->
@@ -49,7 +73,6 @@ status = {
   y: 0,
   text: '',
 }
-text = ''
 
 socket = io('http://192.168.0.20:8081')
 
@@ -60,10 +83,14 @@ socket.on 'config', (config) ->
   typewriter.ignoreMouse = config.ignoreMouse
 
 socket.on 'resetText', ->
+  flushLog()
+  typewriter.resetPosition()
   typewriter.resetText()
 
 socket.on 'resetPosition', ->
+  flushLog()
   typewriter.resetPosition()
+  typewriter.resetText()
 
 sendStatus = ->
   console.log('Sending status:')
@@ -72,14 +99,14 @@ sendStatus = ->
 
 probe = ->
   console.log "Probing..."
-  [mouse, ...] = (dev for dev in udev.list() when isMouse dev)
-  [keyboard, ...] = (dev for dev in udev.list() when isKeyboard dev)
-  status.mouse = !!mouse
-  status.keyboard = !!keyboard
-  if mouse and keyboard
+  [m, ...] = (dev for dev in udev.list() when isMouse dev)
+  [k, ...] = (dev for dev in udev.list() when isKeyboard dev)
+  status.mouse = !!m
+  status.keyboard = !!k
+  if m and k
     clearErr()
-    initTypewriter keyboard.DEVNAME, mouse.DEVNAME
-  else if !mouse
+    initTypewriter k.DEVNAME, m.DEVNAME
+  else if !m
     err "USB mouse not found"
   else
     err "USB keyboard not found"
