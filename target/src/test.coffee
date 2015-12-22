@@ -56,7 +56,7 @@ replay = (desc) ->
 
   typewriter.text
 
-if (process.argv.length >= 3 && process.argv[1] == __filename))
+if (process.argv.length >= 3 && process.argv[1] == __filename)
   run = (f) ->
     test = JSON.parse fs.readFileSync f
     console.log "Actual:"
