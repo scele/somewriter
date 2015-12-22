@@ -26,18 +26,15 @@ disconnected = {
   mouse: false,
   x: 0,
   y: 0,
+  text: '',
 }
 
 status = extend {}, disconnected
 config = {}
-text = ''
 
 sendStatus = (socket) ->
   console.log(status)
   socket.emit('status', status)
-
-sendText = (socket) ->
-  socket.emit('text', text)
 
 sendConfig = (socket) ->
   socket.emit('config', config)
@@ -47,7 +44,7 @@ twitterConfig = JSON.parse(fs.readFileSync path.join(__dirname, 'twitter.json'),
 twitter = new Twitter(twitterConfig)
 twitter.get 'account/verify_credentials', (err, response, req) ->
   if (!err)
-    status.twitter = response
+    status.twitter = {}
     status.twitter.widget = twitterConfig.widget
 
 try
@@ -60,7 +57,6 @@ io.on 'connection', (socket) ->
 
   sendStatus(socket)
   sendConfig(socket)
-  sendText(socket)
 
   socket.on 'updateConfig', (newConfig, callback) ->
     console.log newConfig
@@ -72,7 +68,13 @@ io.on 'connection', (socket) ->
   socket.on 'tweet', (tweet) ->
     twitter.post 'statuses/update', {status: tweet}, (error, tweet, response) ->
       console.log(tweet)
-      console.log(response)
+      ttio.emit('resetText')
+
+  socket.on 'resetText', ->
+    ttio.emit('resetText')
+
+  socket.on 'resetPosition', ->
+    ttio.emit('resetPosition')
 
 # Typewriter connection
 ttio = require('socket.io')(8081, {
@@ -84,12 +86,11 @@ ttio.on 'connection', (socket) ->
   console.log('Typewriter connected!')
 
   status.connected = true
-  sendStatus(io)
   sendConfig(ttio)
 
   socket.on 'disconnect', () ->
     console.log('Typewriter disconnected')
-    status = extend {}, disconnected
+    status.connected = false
     sendStatus(io)
 
   socket.on 'status', (newStatus) ->
@@ -97,8 +98,3 @@ ttio.on 'connection', (socket) ->
     console.log(newStatus)
     extend status, newStatus
     sendStatus(io)
-
-  socket.on 'text', (newText) ->
-    text = newText
-    console.log('Typewriter sent new text: ' + text)
-    sendText(io)

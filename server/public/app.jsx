@@ -41,12 +41,15 @@ var StatusItem = React.createClass({
 var Paper = React.createClass({
   render: function() {
     var style = {
-      top: this.props.y * 16,
-      left: this.props.x * 7.15, // for 13px <pre> font
+      top: this.props.y * 18 || 0,
+      left: this.props.x * 7.15 || 0, // for 13px <pre> font
+    };
+    var prestyle = {
+      minHeight: style.top + 35,
     };
     return (
       <div className="paper">
-        <pre>{this.props.text}</pre>
+        <pre style={prestyle}>{this.props.text}</pre>
         <div className="cursor" style={style}></div>
       </div>
     );
@@ -65,11 +68,9 @@ var TypewriterStatus = React.createClass({
       that.setState({ status: status });
       if (status.twitter && !twitterTimelineCreated) {
         twitterTimelineCreated = true;
-        twttr.widgets.createTimeline(status.twitter.widget, document.getElementById("twitter"));
+        twttr.widgets.createTimeline(status.twitter.widget, document.getElementById("twitter"),
+          { chrome: "nofooter noheader noborders noscrollbar", width: 'auto' });
       }
-    });
-    socket.on('text', function (text) {
-      that.setState({ text: text });
     });
     socket.on('config', function (config) {
       that.setState({ config: config });
@@ -80,10 +81,16 @@ var TypewriterStatus = React.createClass({
     config[event.target.value] = event.target.checked;
     socket.emit('updateConfig', config);
   },
-  onClick: function (event) {
-    if (this.state.text.length) {
-      socket.emit('tweet', this.state.text);
+  tweet: function (event) {
+    if (this.state.status.text.length) {
+      socket.emit('tweet', this.state.status.text);
     }
+  },
+  resetText: function (event) {
+    socket.emit('resetText');
+  },
+  resetPosition: function (event) {
+    socket.emit('resetPosition');
   },
   render: function() {
     var config = this.state.config;
@@ -94,19 +101,25 @@ var TypewriterStatus = React.createClass({
         return (<div>{ip.iface}: {ip.address}</div>);
       });
     }
+    var style = {};
+    if (!connected)
+      style.display = 'none';
     return (
       <div className="commentBox">
         <h3>Status</h3>
         <StatusItem good="Device online" bad="Device offline" value={connected} />
-        <StatusItem good="Keyboard connected" bad="Keyboard not connected" value={this.state.status.keyboard} />
-        <StatusItem good="Mouse connected" bad="Mouse not connected" value={this.state.status.mouse} />
-        <Paper text={this.state.text} x={this.state.status.x} y={this.state.status.y} />
-        <div>x={this.state.status.x}, y={this.state.status.y}</div>
-        {ips}
-        <CheckBox text="Ignore mouse" value="ignoreMouse" checked={config.ignoreMouse}
-                  onChange={this.configChanged} />
-        <input className="btn btn-default" type="button" onClick={this.onClick} value="Tweet" />
-        <div id="twitter"></div>
+        <StatusItem good="Keyboard connected" bad="Keyboard not connected" value={connected && this.state.status.keyboard} />
+        <StatusItem good="Mouse connected" bad="Mouse not connected" value={connected && this.state.status.mouse} />
+        <div style={style}>
+          <Paper text={this.state.status.text} x={this.state.status.x} y={this.state.status.y} />
+          <div>x={this.state.status.x}, y={this.state.status.y}</div>
+          {ips}
+          <CheckBox text="Ignore mouse" value="ignoreMouse" checked={config.ignoreMouse}
+                    onChange={this.configChanged} />
+          <input className="btn btn-default" type="button" onClick={this.tweet} value="Tweet" />
+          <input className="btn btn-default" type="button" onClick={this.resetText} value="Reset text" />
+          <input className="btn btn-default" type="button" onClick={this.resetPosition} value="Reset position" />
+        </div>
       </div>
     );
   }

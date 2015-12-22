@@ -11,3 +11,4 @@ p { padding: 15px; }
   margin-left: 10px;
 }
 .paper { position: relative; }
+.twitterpane { max-width: 520px; float: right !important; }
