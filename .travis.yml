@@ -7,5 +7,6 @@ script:
   - npm run test
   - npm run coveralls
 before_install:
-  - sudo apt-get install libudev-dev -y
+  - sudo apt-get update -qq
+  - sudo apt-get install libudev-dev
   - npm install -g grunt-cli
