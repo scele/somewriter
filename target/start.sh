@@ -2,4 +2,5 @@
 
 # Invoke this script from /etc/rc.local
 
-sudo -u pi forever start `dirname $0`/out/src/main.js
+cd `dirname $0`
+sudo -u pi forever start out/main.js

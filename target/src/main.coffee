@@ -29,7 +29,7 @@ logEvent = (event) ->
 
 flushLog = ->
   log = { output: status.text, events: logEvents }
-  filename = 'trace' + logIndex + '.json'
+  filename = __dirname + '/../log/trace' + logIndex + '.json'
   fs.writeFileSync filename, JSON.stringify(log, null, 4)
   console.log('Wrote log to ' + filename)
   logEvents = []

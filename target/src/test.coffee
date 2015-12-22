@@ -2,7 +2,7 @@ should = require('should')
 _ = require('lodash')
 fs = require('fs')
 {EventEmitter} = require('events')
-testModule = require('../src/typewriter')
+testModule = require('./typewriter')
 Typewriter = testModule.Typewriter
 
 #log = console.log
@@ -66,7 +66,8 @@ if (process.argv.length >= 3)
   run f for f in process.argv[2..]
 else
   describe "Typewriter", ->
-    dir = __dirname + '/traces/'
+    this.timeout 10000
+    dir = __dirname + '/../tests/'
     run = (f) ->
       test = require dir + f
       replay(test).should.equal(test.output)

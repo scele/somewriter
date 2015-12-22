@@ -14,7 +14,7 @@ module.exports = (grunt) ->
             'coffee-script/register',
             'should',
           ]
-        src: ['test/**/*.coffee']
+        src: ['src/test.coffee']
       cov:
         options:
           reporter: 'mocha-lcov-reporter'
@@ -22,11 +22,12 @@ module.exports = (grunt) ->
             'coffee-coverage/register',
             'should',
           ]
-        src: ['test/**/*.coffee']
+        src: ['src/test.coffee']
     coffee:
       files:
         expand: true,
-        src: ['**/*.coffee'],
+        flatten: true,
+        src: ['src/*.coffee'],
         dest: 'out/'
         ext: '.js'
 

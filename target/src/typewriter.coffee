@@ -12,7 +12,7 @@ class Typewriter extends EventEmitter
     @HALF_SPACE = 59
     @FULL_SPACE = 118
     @SMALL_ROLL = 90 # One line is 2 or 3 small rolls, depending on line spacing
-    @STABLE_BEFORE_KEYDOWN_TIME = 150
+    @STABLE_BEFORE_KEYDOWN_TIME = 0
     @x = 0
     @y = 0
     @chars = [[]]
