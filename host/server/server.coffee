@@ -11,7 +11,7 @@ extend = (object, properties) ->
 
 # Server part
 app = express()
-app.use('/', express.static(path.join(__dirname, '..')))
+app.use('/', express.static(path.join(__dirname, '../client')))
 
 port = 8080
 server = app.listen(port)
@@ -40,7 +40,7 @@ sendConfig = (socket) ->
   socket.emit('config', config)
   ttio.emit('config', config)
 
-twitterConfig = JSON.parse(fs.readFileSync path.join(__dirname, 'twitter.json'), 'utf8')
+twitterConfig = JSON.parse(fs.readFileSync path.join(__dirname, '/../../twitter.json'), 'utf8')
 twitter = new Twitter(twitterConfig)
 twitter.get 'account/verify_credentials', (err, response, req) ->
   if (!err)
