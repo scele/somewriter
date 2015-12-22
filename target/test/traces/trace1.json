@@ -1,6 +1,5 @@
 {
-    "realoutput": "fghjkl.,ffgsdfasetyuieeuioperqr",
-    "output": "fgh jkl.,ffgsdfastyuie uio-er qr",
+    "output": "fghjkl.,ffgsdfasetyuieeuioperqr",
     "events": [
         {
             "xDelta": -2,
@@ -2242,8 +2241,8 @@
             "type": "key",
             "code": 25,
             "value": 1,
-            "char": "-",
-            "shiftChar": "=",
+            "char": "p",
+            "shiftChar": "P",
             "time": 1450734326161.549,
             "dev": "/dev/input/event1"
         },
@@ -2280,8 +2279,8 @@
             "type": "key",
             "code": 25,
             "value": 0,
-            "char": "-",
-            "shiftChar": "=",
+            "char": "p",
+            "shiftChar": "P",
             "time": 1450734326273.591,
             "dev": "/dev/input/event1"
         },

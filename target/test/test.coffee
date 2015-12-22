@@ -48,7 +48,6 @@ replay = (desc) ->
     eventMap =
       key: mockKeyboard
       moved: mockMouse
-    log event
     eventMap[event.type].emit(event.type, event)
     lastEvent = event
 
@@ -60,10 +59,10 @@ replay = (desc) ->
 if (process.argv.length >= 3)
   run = (f) ->
     test = JSON.parse fs.readFileSync f
-    console.log "Expected:"
-    console.log test.output
     console.log "Actual:"
     console.log replay test
+    console.log "Expected:"
+    console.log test.output
   run f for f in process.argv[2..]
 else
   describe "Typewriter", ->

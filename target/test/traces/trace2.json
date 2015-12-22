@@ -1,6 +1,5 @@
 {
-    "realoutput": "qwertyuiop-",
-    "output": "qw er tyuio-?",
+    "output": "qwertyuiop-",
     "events": [
         {
             "xDelta": 1,
@@ -782,8 +781,8 @@
             "type": "key",
             "code": 25,
             "value": 1,
-            "char": "-",
-            "shiftChar": "=",
+            "char": "p",
+            "shiftChar": "P",
             "time": 1450734380472.35,
             "dev": "/dev/input/event1"
         },
@@ -820,8 +819,8 @@
             "type": "key",
             "code": 25,
             "value": 0,
-            "char": "-",
-            "shiftChar": "=",
+            "char": "p",
+            "shiftChar": "P",
             "time": 1450734380568.263,
             "dev": "/dev/input/event1"
         },
@@ -872,8 +871,8 @@
             "type": "key",
             "code": 26,
             "value": 1,
-            "char": "?",
-            "shiftChar": "?",
+            "char": "-",
+            "shiftChar": "=",
             "time": 1450734381000.349,
             "dev": "/dev/input/event1"
         },
@@ -903,8 +902,8 @@
             "type": "key",
             "code": 26,
             "value": 0,
-            "char": "?",
-            "shiftChar": "?",
+            "char": "-",
+            "shiftChar": "=",
             "time": 1450734381064.328,
             "dev": "/dev/input/event1"
         },

@@ -1,6 +1,7 @@
 EventEmitter = require('events').EventEmitter
 Keyboard = require('./input').Keyboard
 Mouse = require('./input').Mouse
+_ = require('lodash')
 
 defaultTimeoutProvider =
   set: setTimeout
@@ -11,15 +12,15 @@ class Typewriter extends EventEmitter
     @HALF_SPACE = 59
     @FULL_SPACE = 118
     @SMALL_ROLL = 90 # One line is 2 or 3 small rolls, depending on line spacing
-    @STABLE_AFTER_KEYUP_TIME = 150
+    @STABLE_BEFORE_KEYDOWN_TIME = 150
     @x = 0
     @y = 0
     @chars = [[]]
     @text = ''
     @delta = {x: 0, y: 0}
     @stableYTimeout = null
-    @unstableXTimeout = null
     @ignoreMouse = false
+    @history = []
 
   setMouse: (m) ->
     @mouse?.close()
@@ -40,49 +41,34 @@ class Typewriter extends EventEmitter
   resetPosition: ->
     @x = 0
     @y = 0
+    @history = []
     @delta = {x: 0, y: 0}
     @emitMoved()
 
   emitMoved: ->
     event =
       type: 'moved'
-      x: @x
+      x: Math.round(@x)
       y: @y
     @emit(event.type, event)
 
-  stableX: ->
+  updateX: ->
     oldX = @x
-    @x += Math.round(@delta.x / @HALF_SPACE) * 0.5
+    @x += @delta.x / @HALF_SPACE * 0.5
     if (@x < 0)
       d = -Math.ceil(@x)
-      console.log('Shifting everything to the right by ' + d)
+      console.log('shifting everything to the right by ' + d)
       spaces = Array(d)
       l.unshift(spaces...) for l in @chars
       @x += d
       @updateText()
+    console.log 'updateX @x=' + oldX + ', @delta.x=' + @delta.x + ' -> @x=' + @x + ' @delta.x=0'
     @delta.x = 0
-    console.log('Moved cursor horizontally to ' + @x + ',' + @y)
-    @emitMoved() if oldX != @x
-
-  unstableX: ->
-    oldX = @x
-    deltaUnits = @delta.x / @HALF_SPACE * 0.5;
-    idelta = Math.round(deltaUnits)
-    console.log("unstableX @x=" + @x + " idelta=" + idelta + " @delta.x=" + @delta.x);
-    @delta.x -= idelta / 0.5 * @HALF_SPACE;
-    @x += idelta
-    if (@x < 0)
-      d = -Math.ceil(@x)
-      console.log('Shifting everything to the right by ' + d)
-      spaces = Array(d)
-      l.unshift(spaces...) for l in @chars
-      @x += d
-      @updateText()
     @emitMoved() if oldX != @x
 
   stableY: ->
     oldY = @y
-    console.log('delta.y: ' + @delta.y)
+    console.log('stableY: delta.y=' + @delta.y)
     d = Math.round(@delta.y / @SMALL_ROLL)
     @y += d
     if @y < 0
@@ -112,24 +98,39 @@ class Typewriter extends EventEmitter
       @emit(event.type, event)
 
   keypress: (event) ->
-    if (event.value == 0)
-      # Key up: platen should be stable
-      @timeout.set(@stableX.bind(this), @STABLE_AFTER_KEYUP_TIME)
+    # if (event.value == 0)
+      # Key up
 
     if (event.value == 1)
+      console.log 'keydown ' + event.char
       @stableY()
-      # Cannot call stableX here, because the half tick that begins
-      # a keystroke might race with the keydown signal (and it does).
-      # On the other hand, we need to update the x position in case we
-      # have been scrolling left and right without typing.
-      #@unstableX()
-      if (@x != Math.ceil(@x))
-        console.log('Adjusting half step from ' + @x + ' to ' + Math.ceil(@x))
-        @x = Math.ceil(@x)
 
-      for i in [0..@y] when !(i of @chars)
+      # The platen is not stable here, because the half tick that begins
+      # a keystroke might race with the keydown signal (and it does).
+      # To avoid drift, we need to snap to an integer @x coordinate regularly.
+      # The problem is that it's not easy to know when the platen is in a stable position.
+      # Use the heuristic: small time (@STABLE_BEFORE_KEYDOWN_TIME) before keydown
+      # the platen has been stable.  Find the location at that point in time, snap it
+      # to an integer coordinate, and adjust the current @x accordingly.
+      oldX = _(@history).filter((h) => h.time <= event.time - @STABLE_BEFORE_KEYDOWN_TIME)
+              .sortBy('time').map('x').last()
+      console.log 'found oldX=' + oldX
+
+      if oldX
+        # Bias upwards to avoid misdetecting a strike as one that overwrites the previous character.
+        # The cost is that we are more likely to have accidential (misdetected) spaces.
+        BIAS = 0.2
+        d = oldX - Math.round(oldX + BIAS)
+        console.log 'stabilizing @x from ' + @x + ' by ' + d + ' to ' + (@x - d) + ' (old @x=' + oldX + ')'
+        @x -= d
+
+      x = Math.round(@x)
+      y = @y
+      console.log 'writing ' + event.char + ' to x=' + x + ', y=' + y + ' (@x=' + @x + ', @y=' + @y + ')'
+
+      for i in [0..y] when !(i of @chars)
         @chars[i] = []
-      @chars[@y][@x] = event.char
+      @chars[y][x] = event.char
 
       @updateText()
       if @ignoreMouse
@@ -141,8 +142,10 @@ class Typewriter extends EventEmitter
     @delta.y += event.xDelta
     @timeout.clear(@stableYTimeout)
     @stableYTimeout = @timeout.set(@stableY.bind(this), 50)
-    @timeout.clear(@unstableXTimeout)
-    @unstableXTimeout = @timeout.set(@unstableX.bind(this), 50)
+
+    @updateX()
+    @history.push({x: @x, time: event.time})
+    @history = (h for h in @history when h.time > event.time - 1000)
 
 class MouseHistogram
   constructor: (mouse, @timeout = defaultTimeoutProvider) ->
