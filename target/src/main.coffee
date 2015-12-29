@@ -3,6 +3,8 @@
 udev = require('udev')
 io = require('socket.io-client')
 fs = require('fs')
+gpio = require("pi-gpio")
+exec = require('child_process').exec
 
 os = require('os')
 ifaces = os.networkInterfaces()
@@ -18,6 +20,31 @@ console.log(ips)
 # calibrator = new MouseCalibrator(mouse)
 
 # keyboard.on('key', console.log)
+
+# Pins 5 (wake-up) and 7 (GPIO4) are connected to 6 (GND) when power is on.
+# Pin 5 cannot be read by pi-gpio, it's only used for wake-up as per http://elinux.org/RPI_safe_mode
+# Here we poll pin 7 to detect user's poweroff signal (use internal pullup resistor).
+# Pin layout: http://pinout.xyz/
+pin = 7
+halted = false
+
+pollReset = ->
+  gpio.read pin, (error, value) ->
+    if error
+      console.log error
+      return
+    if value == 1 && !halted
+      socket.emit 'halt'
+      console.log 'Detected poweroff signal...'
+      exec(__dirname + '/../halt.sh')
+      halted = true
+
+gpio.close pin, ->
+  gpio.open pin, "input pullup", (error) ->
+    if error
+      console.log(error)
+      return
+    setInterval pollReset, 300
 
 keyboard = 0
 mouse = 0
