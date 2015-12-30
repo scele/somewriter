@@ -21,6 +21,7 @@
     "lodash": "^2.4.1",
     "pi-gpio": "0.0.8",
     "socket.io-client": "~1.3.7",
+    "twitter": "^1.2.5",
     "udev": "^0.1.0"
   },
   "devDependencies": {

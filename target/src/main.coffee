@@ -5,6 +5,20 @@ io = require('socket.io-client')
 fs = require('fs')
 gpio = require("pi-gpio")
 exec = require('child_process').exec
+path = require('path')
+Twitter = require('twitter')
+
+status = {
+  mouse: false,
+  keyboard: false,
+  ip: ips,
+  x: 0,
+  y: 0,
+  text: '',
+  twitter: false,
+}
+
+socket = io('http://192.168.0.20:8081')
 
 os = require('os')
 ifaces = os.networkInterfaces()
@@ -54,6 +68,36 @@ logEvents = []
 logEvent = (event) ->
   logEvents.push(event)
 
+twitterConfig = JSON.parse(fs.readFileSync path.join(__dirname, '/../../twitter.json'), 'utf8')
+twitter = new Twitter(twitterConfig)
+console.log 'Connecting to twitter...'
+twitter.get 'account/verify_credentials', (err, response, req) ->
+  console.log "Twitter response: " + err
+  if (!err)
+    status.twitter = true
+  else
+    status.twitter = false
+    console.log err
+  updateStatus()
+
+tweet = ->
+  text = status.text
+  status.twitter = false
+  updateStatus()
+  twitter.post 'statuses/update', {status: text}, (error, tweet, response) ->
+    status.twitter = true
+    updateStatus()
+    console.log('Tweeted: ' + text)
+    if (!error)
+      flushLog()
+      typewriter.resetPosition()
+      typewriter.resetText()
+
+onKeypress = (event) ->
+  # 0 = keyup, 123 = custom tweet key
+  if (event.value == 0 && event.code == 123)
+    tweet()
+
 flushLog = ->
   log = { output: status.text, events: logEvents }
   filename = __dirname + '/../log/trace' + logIndex + '.json'
@@ -67,9 +111,7 @@ initTypewriter = (k, m) ->
   keyboard = new Keyboard k
   typewriter.setKeyboard keyboard
   keyboard.on 'key', logEvent
-  keyboard.led(0, 1)
-  keyboard.led(1, 1)
-  keyboard.led(2, 1)
+  keyboard.on 'key', onKeypress
 
   mouse.close() if mouse
   mouse = new Mouse m
@@ -95,19 +137,8 @@ isKeyboard = (k) -> k.ID_INPUT_KEYBOARD and k.DEVNAME?.match /event\d+$/
 err = console.log
 clearErr = -> console.log "Ok!"
 
-status = {
-  mouse: false,
-  keyboard: false,
-  ip: ips,
-  x: 0,
-  y: 0,
-  text: '',
-}
-
-socket = io('http://192.168.0.20:8081')
-
 socket.on 'connect', ->
-  sendStatus()
+  updateStatus()
 
 socket.on 'config', (config) ->
   typewriter.ignoreMouse = config.ignoreMouse
@@ -122,10 +153,13 @@ socket.on 'resetPosition', ->
   typewriter.resetPosition()
   typewriter.resetText()
 
-sendStatus = ->
+updateStatus = ->
   console.log('Sending status:')
   console.log(status)
   socket.emit('status', status)
+  if status.keyboard
+    keyboard.led(2, status.mouse && status.keyboard)
+    keyboard.led(1, status.twitter)
 
 probe = ->
   console.log "Probing..."
@@ -140,7 +174,7 @@ probe = ->
     err "USB mouse not found"
   else
     err "USB keyboard not found"
-  sendStatus()
+  updateStatus()
 
 monitor = udev.monitor()
 monitor.on 'add', (dev) ->
@@ -150,10 +184,10 @@ typewriter = new Typewriter
 typewriter.on 'changed', (event) ->
   status.text = event.text
   console.log(event.text)
-  sendStatus()
+  updateStatus()
 typewriter.on 'moved', (event) ->
   status.x = event.x
   status.y = event.y
-  sendStatus()
+  updateStatus()
 typewriter.on('error', (event) -> probe())
 probe()

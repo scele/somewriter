@@ -98,6 +98,8 @@ class Typewriter extends EventEmitter
       @emit(event.type, event)
 
   keypress: (event) ->
+    return if event.code == 123 # ignore tweet button
+
     # if (event.value == 0)
       # Key up
 
