@@ -11,21 +11,17 @@ EventEmitter = require('events').EventEmitter
 
 class InputDevice extends EventEmitter
   constructor: (@dev, bufferSize, mode) ->
-    @wrap('onOpen')
     @wrap('onRead')
     @buf = new Buffer(bufferSize)
-    fs.open(@dev, mode, @onOpen)
+    @fd = fs.openSync(@dev, mode)
+    @startRead()
   wrap: (name) ->
     fn = this[name]
     self = this
     this[name] = (err, args...) =>
       if err then @emit('error', err) else fn.apply(self, args)
-  onOpen: (@fd) ->
-    @startRead()
-
   startRead: () ->
     fs.read(@fd, @buf, 0, @buf.length, null, @onRead)
-
   onRead: (bytesRead) ->
     event = @parse(@buf)
     if (event)
@@ -33,7 +29,8 @@ class InputDevice extends EventEmitter
       @emit(event.type, event)
     @startRead() if @fd
   close: ->
-    fs.close(@fd, ->)
+    try
+      fs.close(@fd, ->)
     @fd = undefined
 
 class Keyboard extends InputDevice
@@ -121,7 +118,7 @@ class Keyboard extends InputDevice
     buf.writeUInt16LE(0x11, 8) # EV_LED
     buf.writeUInt16LE(led, 10)
     buf.writeUInt32LE(value, 12)
-    fs.write(@fd, buf, 0, buf.length, null)
+    fs.writeSync(@fd, buf, 0, buf.length)
 
 class Mouse extends InputDevice
   constructor: (dev) ->

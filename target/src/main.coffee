@@ -67,6 +67,9 @@ initTypewriter = (k, m) ->
   keyboard = new Keyboard k
   typewriter.setKeyboard keyboard
   keyboard.on 'key', logEvent
+  keyboard.led(0, 1)
+  keyboard.led(1, 1)
+  keyboard.led(2, 1)
 
   mouse.close() if mouse
   mouse = new Mouse m
