@@ -147,7 +147,7 @@ class Typewriter extends EventEmitter
 
     @updateX()
     @history.push({x: @x, time: event.time})
-    @history = (h for h in @history when h.time > event.time - 1000)
+    @history = _(@history).sortBy('time').value()[-20..]
 
 class MouseHistogram
   constructor: (mouse, @timeout = defaultTimeoutProvider) ->
