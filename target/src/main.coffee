@@ -80,8 +80,24 @@ twitter.get 'account/verify_credentials', (err, response, req) ->
     console.log err
   updateStatus()
 
+getTweetText = ->
+  # Take previous lines until we hit three consecutive empty lines.
+  text = ''
+  lines = text.split '\n'
+  i = status.y
+  emptyLines = 0
+  while i >= 0
+    line = lines[i].trim()
+    if line.length
+      text = line + '\n' + text
+      emptyLines = 0
+    else
+      break if ++emptyLines == 3
+    i--
+  return text
+
 tweet = ->
-  text = status.text
+  text = getTweetText()
   status.twitter = false
   updateStatus()
   twitter.post 'statuses/update', {status: text}, (error, tweet, response) ->
@@ -156,6 +172,7 @@ socket.on 'resetPosition', ->
 updateStatus = ->
   console.log('Sending status:')
   console.log(status)
+  status.tweetText = getTweetText()
   socket.emit('status', status)
   if status.keyboard
     keyboard.led(2, status.mouse && status.keyboard)
