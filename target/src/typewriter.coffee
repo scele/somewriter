@@ -57,18 +57,17 @@ class Typewriter extends EventEmitter
     @x += @delta.x / @HALF_SPACE * 0.5
     if (@x < 0)
       d = -Math.ceil(@x)
-      console.log('shifting everything to the right by ' + d)
+      @log('shifting everything to the right by ' + d)
       spaces = Array(d)
       l.unshift(spaces...) for l in @chars
       @x += d
       @updateText()
-    console.log 'updateX @x=' + oldX + ', @delta.x=' + @delta.x + ' -> @x=' + @x + ' @delta.x=0'
+    @log 'updateX @x=' + oldX + ', @delta.x=' + @delta.x + ' -> @x=' + @x + ' @delta.x=0'
     @delta.x = 0
     @emitMoved() if oldX != @x
 
   stableY: ->
     oldY = @y
-    console.log('stableY: delta.y=' + @delta.y)
     d = Math.round(@delta.y / @SMALL_ROLL)
     @y += d
     if @y < 0
@@ -97,14 +96,23 @@ class Typewriter extends EventEmitter
         text: @text
       @emit(event.type, event)
 
+  setTimestamp: (t) ->
+    @timestamp0 = t if !@timestamp0
+    @timestamp = t - @timestamp0
+
+  log: (str) ->
+    console.log '[' + @timestamp.toFixed(2) + '] ' + str
+
   keypress: (event) ->
     return if event.code == 123 # ignore tweet button
+
+    @setTimestamp event.time
 
     # if (event.value == 0)
       # Key up
 
     if (event.value == 1)
-      console.log 'keydown ' + event.char
+      @log 'keydown ' + event.char
       @stableY()
 
       # The platen is not stable here, because the half tick that begins
@@ -123,12 +131,12 @@ class Typewriter extends EventEmitter
         # The cost is that we are more likely to have accidential (misdetected) spaces.
         BIAS = 0.2
         d = oldX - Math.round(oldX + BIAS)
-        console.log 'stabilizing @x from ' + @x + ' by ' + d + ' to ' + (@x - d) + ' (old @x=' + oldX + ')'
+        @log 'stabilizing @x from ' + @x + ' by ' + d + ' to ' + (@x - d) + ' (old @x=' + oldX + ')'
         @x -= d
 
       x = Math.round(@x)
       y = @y
-      console.log 'writing ' + event.char + ' to x=' + x + ', y=' + y + ' (@x=' + @x + ', @y=' + @y + ')'
+      @log 'writing ' + event.char + ' to x=' + x + ', y=' + y + ' (@x=' + @x + ', @y=' + @y + ')'
 
       for i in [0..y] when !(i of @chars)
         @chars[i] = []
@@ -140,6 +148,7 @@ class Typewriter extends EventEmitter
         @emitMoved()
 
   platen: (event) ->
+    @setTimestamp event.time
     @delta.x -= event.yDelta # Remap: x = -y
     @delta.y += event.xDelta
     @timeout.clear(@stableYTimeout)
