@@ -2,8 +2,8 @@ should = require('should')
 _ = require('lodash')
 fs = require('fs')
 {EventEmitter} = require('events')
-testModule = require('./typewriter')
-Typewriter = testModule.Typewriter
+Typewriter = require('./typewriter').Typewriter
+getTweetText = require('./utils').getTweetText
 
 #log = console.log
 log = ->
@@ -73,3 +73,15 @@ else
         test = require dir + f
         replay(test).should.equal(test.output)
   run f for f in fs.readdirSync(dir) when f[0] isnt '.'
+
+  describe 'getTweetText', ->
+    it 'works with empty text', ->
+      (getTweetText '', 0).should.equal ''
+    it 'works if y is bigger than # of lines', ->
+      (getTweetText '', 3).should.equal ''
+    it 'does not cut on two empty lines', ->
+      (getTweetText 'a\n\n\nb', 3).should.equal 'a\nb'
+    it 'cuts on three empty lines', ->
+      (getTweetText 'a\n\n\n\nb', 4).should.equal 'b'
+    it 'cuts on three empty lines where the current line is also empty', ->
+      (getTweetText 'a\n\n\n\n\nb', 4).should.equal ''
