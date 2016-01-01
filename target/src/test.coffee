@@ -65,10 +65,11 @@ if (process.argv.length >= 3 && process.argv[1] == __filename)
     console.log test.output
   run f for f in process.argv[2..]
 else
-  describe "Typewriter", ->
-    this.timeout 10000
-    dir = __dirname + '/../tests/'
-    run = (f) ->
-      test = require dir + f
-      replay(test).should.equal(test.output)
-    it f, -> run f for f in fs.readdirSync(dir) when f[0] isnt '.'
+  dir = __dirname + '/../tests/'
+  run = (f) ->
+    describe f, ->
+      this.timeout 10000
+      it 'output should match', ->
+        test = require dir + f
+        replay(test).should.equal(test.output)
+  run f for f in fs.readdirSync(dir) when f[0] isnt '.'
