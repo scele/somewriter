@@ -12,7 +12,7 @@ class Typewriter extends EventEmitter
     @HALF_SPACE = 59
     @FULL_SPACE = 118
     @SMALL_ROLL = 90 # One line is 2 or 3 small rolls, depending on line spacing
-    @STABLE_BEFORE_KEYDOWN_TIME = 0
+    @STABLE_BEFORE_KEYDOWN_TIME = 50
     @x = 0
     @y = 0
     @chars = [[]]
@@ -122,19 +122,27 @@ class Typewriter extends EventEmitter
       # Use the heuristic: small time (@STABLE_BEFORE_KEYDOWN_TIME) before keydown
       # the platen has been stable.  Find the location at that point in time, snap it
       # to an integer coordinate, and adjust the current @x accordingly.
-      oldX = _(@history).filter((h) => h.time <= event.time - @STABLE_BEFORE_KEYDOWN_TIME)
-              .sortBy('time').map('x').last()
-      console.log 'found oldX=' + oldX
+      # On top of that, we also use the "old X coordinate" to set the location of the character.
+      oldXItem = _(@history).filter((h) => h.time <= event.time - @STABLE_BEFORE_KEYDOWN_TIME)
+              .sortBy('time').last()
+      prev = _(@history).sortBy('time').last()
 
-      if oldX
+      @log 'previous history event ' + (event.time - prev.time) + ' ms ago' if prev
+
+      if oldXItem
+        oldX = oldXItem.x
+        @log 'found oldX=' + oldX + ' from ' + (event.time - oldXItem.time) + ' ms ago'
         # Bias upwards to avoid misdetecting a strike as one that overwrites the previous character.
         # The cost is that we are more likely to have accidential (misdetected) spaces.
         BIAS = 0.2
         d = oldX - Math.round(oldX + BIAS)
         @log 'stabilizing @x from ' + @x + ' by ' + d + ' to ' + (@x - d) + ' (old @x=' + oldX + ')'
         @x -= d
+        x = oldX - d
+      else
+        x = @x
 
-      x = Math.round(@x)
+      x = Math.round(x)
       y = @y
       @log 'writing ' + event.char + ' to x=' + x + ', y=' + y + ' (@x=' + @x + ', @y=' + @y + ')'
 
