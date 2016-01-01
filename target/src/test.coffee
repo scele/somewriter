@@ -85,3 +85,5 @@ else
       (getTweetText 'a\n\n\n\nb', 4).should.equal 'b'
     it 'cuts on three empty lines where the current line is also empty', ->
       (getTweetText 'a\n\n\n\n\nb', 4).should.equal ''
+    it 'forgets text when scrolling down', ->
+      (getTweetText 'a', 4).should.equal ''

@@ -113,7 +113,7 @@ var TypewriterStatus = React.createClass({
         <div style={style}>
           <Paper text={this.state.status.text} x={this.state.status.x} y={this.state.status.y} />
           <div className="paper">
-            <pre>{this.props.tweetText}</pre>
+            <pre>{this.state.status.tweetText}</pre>
           </div>
           <div>x={this.state.status.x}, y={this.state.status.y}</div>
           {ips}

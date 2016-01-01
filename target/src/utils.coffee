@@ -5,13 +5,13 @@ getTweetText = (text, y) ->
   lines = text.split '\n'
   emptyLines = Math.max(0, y - lines.length + 1)
   i = y - emptyLines
-  while i >= 0
+  while i >= 0 && emptyLines < 3
     line = lines[i].trim()
     if line.length
       tweetLines.unshift line
       emptyLines = 0
     else
-      break if ++emptyLines == 3
+      ++emptyLines
     i--
   return tweetLines.join '\n'
 
