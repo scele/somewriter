@@ -7,6 +7,7 @@ gpio = require("pi-gpio")
 exec = require('child_process').exec
 path = require('path')
 Twitter = require('twitter')
+utils = require('./utils')
 
 status = {
   mouse: false,
@@ -80,30 +81,13 @@ twitter.get 'account/verify_credentials', (err, response, req) ->
     console.log err
   updateStatus()
 
-getTweetText = ->
-  # Take previous lines until we hit three consecutive empty lines.
-  text = ''
-  lines = text.split '\n'
-  i = status.y
-  emptyLines = 0
-  while i >= 0
-    line = lines[i].trim()
-    if line.length
-      text = line + '\n' + text
-      emptyLines = 0
-    else
-      break if ++emptyLines == 3
-    i--
-  return text
-
 tweet = ->
-  text = getTweetText()
   status.twitter = false
   updateStatus()
-  twitter.post 'statuses/update', {status: text}, (error, tweet, response) ->
+  twitter.post 'statuses/update', {status: status.tweetText}, (error, tweet, response) ->
     status.twitter = true
     updateStatus()
-    console.log('Tweeted: ' + text)
+    console.log('Tweeted: ' + status.tweetText)
     if (!error)
       flushLog()
       typewriter.resetPosition()
@@ -172,7 +156,7 @@ socket.on 'resetPosition', ->
 updateStatus = ->
   console.log('Sending status:')
   console.log(status)
-  status.tweetText = getTweetText()
+  status.tweetText = utils.getTweetText(status.text, status.y)
   socket.emit('status', status)
   if status.keyboard
     keyboard.led(2, status.mouse && status.keyboard)
@@ -208,3 +192,4 @@ typewriter.on 'moved', (event) ->
   updateStatus()
 typewriter.on('error', (event) -> probe())
 probe()
+
