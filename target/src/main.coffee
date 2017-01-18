@@ -8,26 +8,34 @@ exec = require('child_process').exec
 path = require('path')
 Twitter = require('twitter')
 utils = require('./utils')
+os = require('os')
+
+socket = io('http://192.168.0.20:8081')
 
 status = {
   mouse: false,
   keyboard: false,
-  ip: ips,
+  ip: [],
+  ssid: '',
   x: 0,
   y: 0,
   text: '',
   twitter: false,
 }
 
-socket = io('http://192.168.0.20:8081')
+updateSSID = ->
+  exec 'iwgetid -r', (error, stdout, stderr) ->
+    status.ssid = stdout
+    updateStatus()
 
-os = require('os')
-ifaces = os.networkInterfaces()
-console.log(ifaces)
-ipv4 = (iface) -> 'IPv4' == iface.family && !iface.internal
-ips = (({iface: ifname, address: i.address} for i in ii when ipv4(i)) for ifname, ii of ifaces)
-ips = [].concat.apply([], ips)
-console.log(ips)
+updateIP = ->
+  ifaces = os.networkInterfaces()
+  ipv4 = (iface) -> 'IPv4' == iface.family && !iface.internal
+  ips = (({iface: ifname, address: i.address} for i in ii when ipv4(i)) for ifname, ii of ifaces)
+  status.ip = [].concat.apply([], ips)
+  console.log(status.ip)
+
+updateIP()
 
 # histogram = new MouseHistogram(mouse)
 # setInterval(console.log, 5000, histogram)
@@ -138,6 +146,8 @@ err = console.log
 clearErr = -> console.log "Ok!"
 
 socket.on 'connect', ->
+  updateIP()
+  updateSSID()
   updateStatus()
 
 socket.on 'config', (config) ->
@@ -158,7 +168,7 @@ updateStatus = ->
   console.log(status)
   status.tweetText = utils.getTweetText(status.text, status.y)
   socket.emit('status', status)
-  if status.keyboard
+  if status.keyboard && keyboard
     keyboard.led(2, status.mouse && status.keyboard)
     keyboard.led(1, status.twitter)
 
