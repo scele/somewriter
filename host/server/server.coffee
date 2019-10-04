@@ -13,11 +13,12 @@ extend = (object, properties) ->
 app = express()
 app.use('/', express.static(path.join(__dirname, '../client')))
 
-port = 8080
+port = 8089
 server = app.listen(port)
 console.log('Server listening on port ' + port)
 
 # Socket.IO part
+#io = require('socket.io')(server, {path: '/kirjoituskone/socket.io'})
 io = require('socket.io')(server)
 
 disconnected = {
@@ -43,6 +44,9 @@ sendConfig = (socket) ->
 twitterConfig = JSON.parse(fs.readFileSync path.join(__dirname, '/../../twitter.json'), 'utf8')
 twitter = new Twitter(twitterConfig)
 twitter.get 'account/verify_credentials', (err, response, req) ->
+  console.log 'Twitter credential check: '
+  console.log err
+  console.log response
   if (!err)
     status.twitter = {}
     status.twitter.widget = twitterConfig.widget

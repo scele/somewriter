@@ -2,7 +2,8 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var io = require('socket.io-client');
 
-var socket = io();
+var socket = io('http://kingremy.com:8089');
+//var socket = io('http://kingremy.com/kirjoituskone/', {path: "/kirjoituskone/socket.io"});
 
 var CheckBox = React.createClass({
   getInitialState: function () {
@@ -116,6 +117,8 @@ var TypewriterStatus = React.createClass({
             <pre>{this.state.status.tweetText}</pre>
           </div>
           <div>x={this.state.status.x}, y={this.state.status.y}</div>
+          <div>SSID: {this.state.status.ssid}</div>
+          <div>MAC: 6c198fb4e6da</div>
           {ips}
           <CheckBox text="Ignore mouse" value="ignoreMouse" checked={config.ignoreMouse}
                     onChange={this.configChanged} />

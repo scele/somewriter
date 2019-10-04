@@ -13,7 +13,7 @@ module.exports = (grunt) ->
           {
             expand: true
             cwd: 'client'
-            src: ['*.css', '*.html']
+            src: ['*.css', '*.html', '*.jpg', '*.png']
             dest: 'out/client'
           }
         ]

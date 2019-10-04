@@ -12,3 +12,7 @@ p { padding: 15px; }
 }
 .paper { position: relative; }
 .twitterpane { max-width: 520px; float: right !important; }
+.images { text-align: center; margin-top: 100px; }
+.images img { height: 300px; }
+.main { text-align: center; }
+.twitter-container { width: 800px; display: inline-block; }
